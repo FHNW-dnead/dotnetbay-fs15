@@ -9,6 +9,10 @@ namespace DotNetBay.Model
 
         public double StartPrice { get; set; }
 
+        public string Title { get; set; }
+        
+        public string Description { get; set; }
+
         public double CurrentPrice { get; set; }
 
         /// <summary>

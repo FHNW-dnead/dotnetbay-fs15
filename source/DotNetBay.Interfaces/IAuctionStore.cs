@@ -1,10 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Linq;
 using DotNetBay.Model;
 
 namespace DotNetBay.Interfaces
 {
     public interface IAuctionStore
     {
-        List<Auction> GetAll();
+        IQueryable<Auction> GetAuctions();
+        
+        Auction Add(Auction auction);
+        Auction Update(Auction auction);
+        
+        Bid Add(Bid bid);
+
+        Bid GetBid(Guid transactionId);
     }
 }

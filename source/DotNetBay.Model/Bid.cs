@@ -6,9 +6,9 @@ namespace DotNetBay.Model
     {
         public long Id { get; set; }
 
-        public DateTime ReceivedOnUtc { get; set; }
+        public DateTime ReceivedOnUtc { get; private set; }
 
-        public Guid TransactionId { get; set; }
+        public Guid TransactionId { get; private set; }
 
         public Auction Auction { get; set; }
 

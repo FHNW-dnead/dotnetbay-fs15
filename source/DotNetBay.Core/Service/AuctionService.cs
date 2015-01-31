@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using DotNetBay.Interfaces;
 using DotNetBay.Model;
 
@@ -13,9 +13,28 @@ namespace DotNetBay.Core.Service
             this.auctionStore = auctionStore;
         }
 
-        public List<Auction> GetAllAuctions()
+        public IQueryable<Auction> GetAllAuctions()
         {
-            return this.auctionStore.GetAll();
+            return this.auctionStore.GetAuctions();
+        }
+
+        public Auction AddAuction(Auction auction)
+        {
+            return this.auctionStore.Add(auction);
+        }
+
+        public Bid PlaceBid(Member bidder, Auction auction, double amount)
+        {
+            var bid = new Bid()
+            {
+                Auction = auction,
+                Amount = amount,
+                Bidder = bidder
+            };
+
+            this.auctionStore.Add(bid);
+
+            return bid;
         }
     }
 }
