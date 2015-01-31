@@ -47,6 +47,24 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetBay.Core\DotNetBay.Core.csproj">
+      <Project>{9EF46B21-B552-4CC6-A4C0-E81091A4064B}</Project>
+      <Name>DotNetBay.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotNetBay.Data.FileStorage\DotNetBay.Data.FileStorage.csproj">
+      <Project>{92942123-C7EC-4418-9B48-F5D62BE7E7A3}</Project>
+      <Name>DotNetBay.Data.FileStorage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotNetBay.Interfaces\DotNetBay.Interfaces.csproj">
+      <Project>{17745E6C-337C-44BD-9C50-5F1D45CEADA5}</Project>
+      <Name>DotNetBay.Interfaces</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DotNetBay.Model\DotNetBay.Model.csproj">
+      <Project>{908D8739-3185-46EB-A03E-6B6C3849857C}</Project>
+      <Name>DotNetBay.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Web;
+using DotNetBay.Core.Service;
+using DotNetBay.Data.FileStorage;
 
 namespace DotNetBay.Cmd
 {
@@ -10,6 +11,17 @@ namespace DotNetBay.Cmd
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine("DotNetBay Commandline");
+
+            var auctionService = new AuctionService(new FileStorage());
+
+            var allAuctions = auctionService.GetAllAuctions();
+
+            Console.WriteLine("Found {0} auctions in store.", allAuctions.Count);
+
+            Console.Write("Press enter to quit");
+            Console.ReadLine();
+
             Environment.Exit(0);
         }
     }
