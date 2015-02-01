@@ -4,9 +4,10 @@ using DotNetBay.Model;
 
 namespace DotNetBay.Interfaces
 {
-    public interface IAuctionStore
+    public interface IStorageProvider
     {
         IQueryable<Auction> GetAuctions();
+        IQueryable<Member> GetMembers();
         
         Auction Add(Auction auction);
         Auction Update(Auction auction);

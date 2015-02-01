@@ -6,21 +6,21 @@ namespace DotNetBay.Core.Service
 {
     public class AuctionService : IAuctionService
     {
-        private readonly IAuctionStore auctionStore;
+        private readonly IStorageProvider storageProvider;
 
-        public AuctionService(IAuctionStore auctionStore)
+        public AuctionService(IStorageProvider storageProvider)
         {
-            this.auctionStore = auctionStore;
+            this.storageProvider = storageProvider;
         }
 
         public IQueryable<Auction> GetAllAuctions()
         {
-            return this.auctionStore.GetAuctions();
+            return this.storageProvider.GetAuctions();
         }
 
         public Auction AddAuction(Auction auction)
         {
-            return this.auctionStore.Add(auction);
+            return this.storageProvider.Add(auction);
         }
 
         public Bid PlaceBid(Member bidder, Auction auction, double amount)
@@ -32,7 +32,7 @@ namespace DotNetBay.Core.Service
                 Bidder = bidder
             };
 
-            this.auctionStore.Add(bid);
+            this.storageProvider.Add(bid);
 
             return bid;
         }
