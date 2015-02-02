@@ -213,6 +213,22 @@ namespace DotNetBay.Data.FileStorage
             }
         }
 
+        protected virtual void AfterLoad()
+        {
+        }
+
+        protected void BeforeLoad()
+        {
+        }
+
+        protected void AfterSave()
+        {
+        }
+
+        protected void BeforeSave()
+        {
+        }
+
         private void ThrowIfReferenceNotFound<T, R>(T obj, Func<T, List<R>> accessor, List<R> validInstances, Func<R, object> resolver)
         {
             var value = accessor(obj);
@@ -250,6 +266,8 @@ namespace DotNetBay.Data.FileStorage
 
         private void Load()
         {
+            this.BeforeLoad();
+
             if (!File.Exists(this.fullPath))
             {
                 var file = File.Create(this.fullPath);
@@ -263,13 +281,19 @@ namespace DotNetBay.Data.FileStorage
             this.data = restored ?? new DataRootElement();
 
             this.isLoaded = true;
+
+            this.AfterLoad();
         }
 
         private void Save()
         {
+            this.BeforeSave();
+
             var content = JsonConvert.SerializeObject(this.data, this.jsonSerializerSettings);
 
             File.WriteAllText(this.fullPath, content);
+
+            this.AfterSave();
         }
 
         private void EnsureCompleteLoaded()
