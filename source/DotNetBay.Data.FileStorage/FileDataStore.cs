@@ -169,6 +169,10 @@ namespace DotNetBay.Data.FileStorage
             {
                 this.EnsureCompleteLoaded();
 
+                // Check References
+                this.ThrowIfReferenceNotFound(bid, x => x.Auction, this.data.Auctions, r => r.Id);
+                this.ThrowIfReferenceNotFound(bid, x => x.Bidder, this.data.Members, r => r.UniqueId);
+
                 // Does the auction exist?
                 if (this.data.Auctions.All(a => a.Id != bid.Auction.Id))
                 {
@@ -307,7 +311,7 @@ namespace DotNetBay.Data.FileStorage
             }
 
             var referencedElementsToTest = value.Where(x => validInstances.Any(r => identificationAccessor(r) == identificationAccessor(x)));
-            var resolvedElementsById = validInstances.Where(x => referencedElementsToTest.Any(r => identificationAccessor(r) == identificationAccessor(x)));
+            var resolvedElementsById = validInstances.Where(x => referencedElementsToTest.Any(r => identificationAccessor(r).Equals(identificationAccessor(x))));
 
             if (referencedElementsToTest.Any(element => !resolvedElementsById.Contains(element)))
             {
@@ -328,7 +332,7 @@ namespace DotNetBay.Data.FileStorage
                 return;
             }
 
-            var resolvedElementById = validInstances.FirstOrDefault(x => identificationAccessor(x) == identificationAccessor(referencedElement));
+            var resolvedElementById = validInstances.FirstOrDefault(x => identificationAccessor(x).Equals(identificationAccessor(referencedElement)));
 
             if (referencedElement != resolvedElementById)
             {
