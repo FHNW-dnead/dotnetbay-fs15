@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -9,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Zuehlke Technology Group")]
-[assembly: AssemblyProduct("DotNetBay.Core.Test")]
+[assembly: AssemblyProduct("DotNetBay.Test")]
 [assembly: AssemblyCopyright("Copyright © Zuehlke Technology Group 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

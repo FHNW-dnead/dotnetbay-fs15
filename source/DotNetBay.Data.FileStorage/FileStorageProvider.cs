@@ -13,11 +13,11 @@ namespace DotNetBay.Data.FileStorage
         // Poor-Mans locking mechanism
         private readonly object syncRoot = new object();
 
-        private bool isLoaded = false;
-        private string fullPath;
+        private bool isLoaded;
+        private readonly string fullPath;
 
         private DataRootElement data;
-        private JsonSerializerSettings jsonSerializerSettings;
+        private readonly JsonSerializerSettings jsonSerializerSettings;
 
         public FileStorageProvider(string fileName)
         {

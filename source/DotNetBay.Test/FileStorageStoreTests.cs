@@ -42,7 +42,7 @@ namespace DotNetBay.Core.Test
             var myAuction = CreateAnAuction();
             myAuction.Seller = CreateAMember();
 
-            Auction auctionFromStore = null;
+            Auction auctionFromStore;
 
             using (var tempFile = new TempFile())
             {
@@ -65,8 +65,8 @@ namespace DotNetBay.Core.Test
 
             myAuction.Seller = myMember;
 
-            Member memberFromStore = null;
-            Auction auctionFromStore = null;
+            Member memberFromStore;
+            Auction auctionFromStore;
 
             using (var tempFile = new TempFile())
             {
@@ -101,8 +101,8 @@ namespace DotNetBay.Core.Test
             myAuction.Seller = myMember;
             myMember.Auctions = new List<Auction>(new[] { myAuction });
 
-            Member memberForStore = null;
-            Auction auctionFromStore = null;
+            Member memberForStore;
+            Auction auctionFromStore;
 
             using (var tempFile = new TempFile())
             {
@@ -133,8 +133,8 @@ namespace DotNetBay.Core.Test
             // References
             myAuction.Seller = myMember;
 
-            IQueryable<Member> allMembersFromStore = null;
-            IQueryable<Auction> allAuctionFromStore = null;
+            IQueryable<Member> allMembersFromStore;
+            IQueryable<Auction> allAuctionFromStore;
             
             using (var tempFile = new TempFile())
             {
@@ -211,8 +211,8 @@ namespace DotNetBay.Core.Test
             myAuction.Seller = myMember;
             myMember.Auctions = new List<Auction>(new[] { myAuction });
 
-            IQueryable<Member> allMembersFromStore = null;
-            IQueryable<Auction> allAuctionFromStore = null;
+            IQueryable<Member> allMembersFromStore;
+            IQueryable<Auction> allAuctionFromStore;
 
             using (var tempFile = new TempFile())
             {

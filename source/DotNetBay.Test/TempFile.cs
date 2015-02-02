@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace DotNetBay.Core.Test
+namespace DotNetBay.Test
 {
     public class TempFile : IDisposable
     {
@@ -27,9 +27,8 @@ namespace DotNetBay.Core.Test
             {
                 File.Delete(this.fullPath);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                
             }
         }
     }

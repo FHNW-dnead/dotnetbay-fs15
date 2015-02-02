@@ -2,7 +2,6 @@
 using System.Linq;
 using DotNetBay.Core.Service;
 using DotNetBay.Data.FileStorage;
-using DotNetBay.Model;
 
 namespace DotNetBay.Cmd
 {
