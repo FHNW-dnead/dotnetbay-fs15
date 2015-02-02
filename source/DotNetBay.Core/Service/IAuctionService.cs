@@ -5,6 +5,10 @@ namespace DotNetBay.Core.Service
 {
     public interface IAuctionService
     {
-        IQueryable<Auction> GetAllAuctions();
+        IQueryable<Auction> GetAuctions();
+
+        Auction Save(Auction auction);
+
+        Bid PlaceBid(Member bidder, Auction auction, double amount);
     }
 }
