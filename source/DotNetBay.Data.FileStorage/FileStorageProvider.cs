@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using DotNetBay.Interfaces;
@@ -75,35 +74,40 @@ namespace DotNetBay.Data.FileStorage
         {
             if (auction.Seller == null)
             {
-                throw new ArgumentOutOfRangeException("auction.Seller", "Its required to set a seller");
+                throw new ArgumentOutOfRangeException("auction.seller", "Its required to set a seller");
             }
 
             lock (this.syncRoot)
             {
                 this.EnsureCompleteLoaded();
 
-                var maxId = this.data.Auctions.Any() ? this.data.Auctions.Max(a => a.Id) : 1;
+                if (this.data.Auctions.Any(a => a.Id == auction.Id))
+                {
+                    throw new ArgumentOutOfRangeException("auction", "The auction is already stored");
+                }
+
+                var maxId = this.data.Auctions.Any() ? this.data.Auctions.Max(a => a.Id) : 0;
 
                 auction.Id = maxId + 1;
 
                 this.data.Auctions.Add(auction);
 
-                if (!this.data.Members.Contains(auction.Seller))
+                // Find the member in "store"
+                var seller = this.data.Members.FirstOrDefault(m => m.UniqueId == auction.Seller.UniqueId);
+
+                // Create member as seller if not exists
+                if (seller == null)
                 {
                     // The seller does not yet exist in store
-                    var seller = auction.Seller;
+                    seller = auction.Seller;
                     seller.Auctions = new List<Auction>(new[] {auction});
                     this.data.Members.Add(seller);
                 }
-                else
-                {
-                    // The seller already exists    
-                    var seller = this.data.Members.Find(m => m == auction.Seller);
 
-                    if (!seller.Auctions.Contains(auction))
-                    {
-                        seller.Auctions.Add(auction);
-                    }
+                // Add auction to sellers list of auctions
+                if (seller.Auctions.All(a => a.Id != auction.Id))
+                {
+                    seller.Auctions.Add(auction);
                 }
 
                 this.Save();
@@ -118,17 +122,22 @@ namespace DotNetBay.Data.FileStorage
             {
                 this.EnsureCompleteLoaded();
 
-                if (this.data.Members.Contains(member))
+                if (this.data.Members.Any(m=> m.UniqueId == member.UniqueId))
                 {
-                    throw new ArgumentOutOfRangeException("member", "This member already exists");
+                    throw new ArgumentOutOfRangeException("member", "A member with this unique id already exists");
                 }
 
                 this.data.Members.Add(member);
 
                 if (member.Auctions != null && member.Auctions.Any())
                 {
-
+                    foreach (var auction in member.Auctions)
+                    {
+                        this.Add(auction);
+                    }
                 }
+
+                this.Save();
 
                 return null;
             }

@@ -3,43 +3,8 @@ using System.Collections.Generic;
 
 namespace DotNetBay.Model
 {
-    public class Auction : IEquatable<Auction>
+    public class Auction
     {
-        #region Equality
-
-        public bool Equals(Auction other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return this.Id == other.Id;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Auction) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return this.Id.GetHashCode();
-        }
-
-        public static bool operator ==(Auction left, Auction right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(Auction left, Auction right)
-        {
-            return !Equals(left, right);
-        }
-
-
-        #endregion
-
         public long Id { get; set; }
 
         public double StartPrice { get; set; }
