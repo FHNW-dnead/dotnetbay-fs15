@@ -74,7 +74,7 @@ namespace DotNetBay.Data.FileStorage
         {
             if (auction.Seller == null)
             {
-                throw new ArgumentOutOfRangeException("auction.seller", "Its required to set a seller");
+                throw new ArgumentException("Its required to set a seller");
             }
 
             lock (this.syncRoot)
@@ -83,7 +83,7 @@ namespace DotNetBay.Data.FileStorage
 
                 if (this.data.Auctions.Any(a => a.Id == auction.Id))
                 {
-                    throw new ArgumentOutOfRangeException("auction", "The auction is already stored");
+                    throw new ArgumentException("The auction is already stored");
                 }
 
                 var maxId = this.data.Auctions.Any() ? this.data.Auctions.Max(a => a.Id) : 0;
@@ -124,7 +124,7 @@ namespace DotNetBay.Data.FileStorage
 
                 if (this.data.Members.Any(m=> m.UniqueId == member.UniqueId))
                 {
-                    throw new ArgumentOutOfRangeException("member", "A member with this unique id already exists");
+                    throw new ArgumentException("A member with this unique id already exists");
                 }
 
                 this.data.Members.Add(member);
