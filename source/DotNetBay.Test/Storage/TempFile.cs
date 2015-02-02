@@ -7,13 +7,14 @@ namespace DotNetBay.Test.Storage
     {
         private readonly string fullPath;
 
-        public string FullPath {
-            get { return this.fullPath; }
-        }
-
         public TempFile()
         {
             this.fullPath = Path.GetTempFileName();
+        }
+
+        public string FullPath 
+        {
+            get { return this.fullPath; }
         }
 
         public override string ToString()

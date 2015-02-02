@@ -12,12 +12,12 @@ namespace DotNetBay.Data.FileStorage
     {
         // Poor-Mans locking mechanism
         private readonly object syncRoot = new object();
+        private readonly string fullPath;
+        private readonly JsonSerializerSettings jsonSerializerSettings;
 
         private bool isLoaded;
-        private readonly string fullPath;
 
         private DataRootElement data;
-        private readonly JsonSerializerSettings jsonSerializerSettings;
 
         public FileDataStore(string fileName)
         {
@@ -28,39 +28,6 @@ namespace DotNetBay.Data.FileStorage
             {
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects
             };
-        }
-
-        public void Load()
-        {
-            if (!File.Exists(this.fullPath))
-            {
-                var file = File.Create(this.fullPath);
-                file.Close();
-            }
-
-            var content = File.ReadAllText(this.fullPath);
-
-            var restored = JsonConvert.DeserializeObject<DataRootElement>(content, this.jsonSerializerSettings);
-
-            this.data = restored ?? new DataRootElement();
-
-            this.isLoaded = true;
-        }
-
-        public void Save()
-        {
-            var content = JsonConvert.SerializeObject(this.data, this.jsonSerializerSettings);
-
-            File.WriteAllText(this.fullPath, content);
-        }
-
-        private void EnsureCompleteLoaded()
-        {
-            if (!this.isLoaded || this.data == null || this.data.Auctions == null || this.data.Bids == null ||
-                this.data.Members == null)
-            {
-                this.Load();
-            }
         }
 
         public Auction Add(Auction auction)
@@ -79,7 +46,7 @@ namespace DotNetBay.Data.FileStorage
                     throw new ArgumentException("The auction is already stored");
                 }
 
-                // TODO: Fail if the references are not the same
+                //// TODO: Fail if the references are not the same
 
                 var maxId = this.data.Auctions.Any() ? this.data.Auctions.Max(a => a.Id) : 0;
 
@@ -95,7 +62,7 @@ namespace DotNetBay.Data.FileStorage
                 {
                     // The seller does not yet exist in store
                     seller = auction.Seller;
-                    seller.Auctions = new List<Auction>(new[] {auction});
+                    seller.Auctions = new List<Auction>(new[] { auction });
                     this.data.Members.Add(seller);
                 }
 
@@ -117,12 +84,12 @@ namespace DotNetBay.Data.FileStorage
             {
                 this.EnsureCompleteLoaded();
 
-                if (this.data.Members.Any(m=> m.UniqueId == member.UniqueId))
+                if (this.data.Members.Any(m => m.UniqueId == member.UniqueId))
                 {
                     throw new ArgumentException("A member with the same uniqueId already exists!");
                 }
 
-                // TODO: Fail if the references are not the same
+                //// TODO: Fail if the references are not the same
 
                 this.data.Members.Add(member);
 
@@ -156,11 +123,11 @@ namespace DotNetBay.Data.FileStorage
                     throw new ApplicationException("This auction does not exist and cannot be updated!");
                 }
 
-                // TODO: Fail if the references are not the same
+                //// TODO: Fail if the references are not the same
 
-                // TODO Update 
+                //// TODO Update 
 
-                // TODO Handle Bids (references, add to other list)
+                //// TODO Handle Bids (references, add to other list)
 
                 return null;
             }
@@ -194,7 +161,7 @@ namespace DotNetBay.Data.FileStorage
                     throw new ApplicationException("the bidder does not exist and cannot be added this way!");
                 }
 
-                // TODO: Fail if the references are not the same
+                //// TODO: Fail if the references are not the same
 
                 var maxId = this.data.Bids.Any() ? this.data.Bids.Max(a => a.Id) : 0;
                 bid.Id = maxId + 1;
@@ -238,6 +205,39 @@ namespace DotNetBay.Data.FileStorage
                 this.EnsureCompleteLoaded();
 
                 return this.data.Members.AsQueryable();
+            }
+        }
+
+        private void Load()
+        {
+            if (!File.Exists(this.fullPath))
+            {
+                var file = File.Create(this.fullPath);
+                file.Close();
+            }
+
+            var content = File.ReadAllText(this.fullPath);
+
+            var restored = JsonConvert.DeserializeObject<DataRootElement>(content, this.jsonSerializerSettings);
+
+            this.data = restored ?? new DataRootElement();
+
+            this.isLoaded = true;
+        }
+
+        private void Save()
+        {
+            var content = JsonConvert.SerializeObject(this.data, this.jsonSerializerSettings);
+
+            File.WriteAllText(this.fullPath, content);
+        }
+
+        private void EnsureCompleteLoaded()
+        {
+            if (!this.isLoaded || this.data == null || this.data.Auctions == null || this.data.Bids == null ||
+                this.data.Members == null)
+            {
+                this.Load();
             }
         }
     }

@@ -9,31 +9,6 @@ namespace DotNetBay.Test.Storage
 {
     public abstract class StorageProviderBaseTests
     {
-        #region Create Helpers
-
-        private static Auction CreateAnAuction()
-        {
-            return new Auction()
-            {
-                Title = "TitleOfTheAuction",
-                StartPrice = 50.5,
-                StartDateTimeUtc = DateTime.UtcNow.AddDays(10),
-            };
-        }
-
-        private static Member CreateAMember()
-        {
-            return new Member()
-            {
-                Name = "GeneratedMember",
-                UniqueId = "UniqueId" + Guid.NewGuid()
-            };
-        }
-
-        #endregion
-
-        protected abstract IDataStoreFactory CreateFactory();
-
         [TestCase]
         public void GivenAnEmptyStore_AddOneAuction_NotEmptyAnymore()
         {
@@ -167,7 +142,7 @@ namespace DotNetBay.Test.Storage
             myAuction.Seller = theSeller;
 
             var theBidder = CreateAMember();
-            var aBid = new Bid()
+            var bid = new Bid()
             {
                 Auction = myAuction,
                 Bidder = theBidder,
@@ -181,7 +156,7 @@ namespace DotNetBay.Test.Storage
                 var testStore = factory.CreateStore();
                 testStore.Add(myAuction);
                 testStore.Add(theBidder);
-                testStore.Add(aBid);
+                testStore.Add(bid);
 
                 allAuctionsFromStore = testStore.GetAuctions().ToList();
             }
@@ -191,7 +166,7 @@ namespace DotNetBay.Test.Storage
             Assert.IsNotNull(allAuctionsFromStore[0].Bids);
 
             Assert.AreEqual(1, allAuctionsFromStore[0].Bids.Count);
-            Assert.AreEqual(aBid, allAuctionsFromStore[0].Bids[0]);
+            Assert.AreEqual(bid, allAuctionsFromStore[0].Bids[0]);
         }
 
         [TestCase]
@@ -204,7 +179,7 @@ namespace DotNetBay.Test.Storage
             myAuction.Seller = theSeller;
 
             var theBidder = CreateAMember();
-            var aBid = new Bid()
+            var bid = new Bid()
             {
                 Auction = myAuction,
                 Bidder = theBidder,
@@ -218,13 +193,13 @@ namespace DotNetBay.Test.Storage
                 var testStore = factory.CreateStore();
                 testStore.Add(theBidder);
                 testStore.Add(myAuction);
-                testStore.Add(aBid);
+                testStore.Add(bid);
 
-                retrievedBid = testStore.GetBidByTransactionId(aBid.TransactionId);
+                retrievedBid = testStore.GetBidByTransactionId(bid.TransactionId);
             }
 
             Assert.IsNotNull(retrievedBid);
-            Assert.AreEqual(aBid, retrievedBid);
+            Assert.AreEqual(bid, retrievedBid);
         }
 
         [TestCase]
@@ -298,5 +273,30 @@ namespace DotNetBay.Test.Storage
             Assert.AreEqual(allAuctionFromStore.FirstOrDefault().Seller, allMembersFromStore.FirstOrDefault());
             Assert.AreEqual(allMembersFromStore.FirstOrDefault().Auctions.FirstOrDefault(), allAuctionFromStore.FirstOrDefault());
         }
+
+        protected abstract IDataStoreFactory CreateFactory();
+
+        #region Create Helpers
+
+        private static Auction CreateAnAuction()
+        {
+            return new Auction()
+            {
+                Title = "TitleOfTheAuction",
+                StartPrice = 50.5,
+                StartDateTimeUtc = DateTime.UtcNow.AddDays(10),
+            };
+        }
+
+        private static Member CreateAMember()
+        {
+            return new Member()
+            {
+                Name = "GeneratedMember",
+                UniqueId = "UniqueId" + Guid.NewGuid()
+            };
+        }
+
+        #endregion
     }
 }

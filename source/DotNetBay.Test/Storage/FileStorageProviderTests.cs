@@ -5,6 +5,11 @@ namespace DotNetBay.Test.Storage
 {
     public class FileStorageProviderTests : StorageProviderBaseTests
     {
+        protected override IDataStoreFactory CreateFactory()
+        {
+            return new TempFileDataStoreFactory();
+        }
+
         public class TempFileDataStoreFactory : IDataStoreFactory
         {
             private readonly TempFile tempFile;
@@ -23,11 +28,6 @@ namespace DotNetBay.Test.Storage
             {
                 return new FileDataStore(this.tempFile.FullPath);
             }
-        }
-
-        protected override IDataStoreFactory CreateFactory()
-        {
-            return new TempFileDataStoreFactory();
         }
     }
 }

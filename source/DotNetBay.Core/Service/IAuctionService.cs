@@ -3,7 +3,7 @@ using DotNetBay.Model;
 
 namespace DotNetBay.Core.Service
 {
-    interface IAuctionService
+    public interface IAuctionService
     {
         IQueryable<Auction> GetAllAuctions();
     }

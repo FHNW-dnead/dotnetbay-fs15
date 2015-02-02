@@ -5,6 +5,11 @@ namespace DotNetBay.Model
 {
     public class Auction
     {
+        public Auction()
+        {
+            this.Bids = new List<Bid>();
+        }
+
         public long Id { get; set; }
 
         public double StartPrice { get; set; }
@@ -16,12 +21,12 @@ namespace DotNetBay.Model
         public double CurrentPrice { get; set; }
 
         /// <summary>
-        /// Always work with UTC DateTime values to avoid wrong data when serializing the values
+        /// Gets or sets the UTC DateTime values to avoid wrong data when serializing the values
         /// </summary>
         public DateTime StartDateTimeUtc { get; set; }
 
         /// <summary>
-        /// Always work with UTC DateTime values to avoid wrong data when serializing the values
+        /// Gets or sets the UTC DateTime values to avoid wrong data when serializing the values
         /// </summary>
         public DateTime EndDateTimeUtc { get; set; }
 
@@ -30,11 +35,6 @@ namespace DotNetBay.Model
         public Member Winner { get; set; }
 
         public List<Bid> Bids { get; set; }
-
-        public Auction()
-        {
-            this.Bids = new List<Bid>();
-        }
 
         public bool HasStarted
         {

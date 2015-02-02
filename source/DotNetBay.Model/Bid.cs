@@ -4,6 +4,11 @@ namespace DotNetBay.Model
 {
     public class Bid
     {
+        public Bid()
+        {
+            this.TransactionId = new Guid();
+        }
+
         public long Id { get; set; }
 
         public DateTime ReceivedOnUtc { get; set; }
@@ -17,10 +22,5 @@ namespace DotNetBay.Model
         public double Amount { get; set; }
 
         public bool? Accepted { get; set; }
-
-        public Bid()
-        {
-            this.TransactionId = new Guid();
-        }
     }
 }

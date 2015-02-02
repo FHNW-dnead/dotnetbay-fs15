@@ -20,7 +20,6 @@ namespace DotNetBay.Cmd
 
             Console.WriteLine("Found {0} auctions returned by the service.", allAuctions.Count());
 
-
             Console.Write("Press enter to quit");
             Console.ReadLine();
 
