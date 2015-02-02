@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetBay.Model", "DotNetBa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetBay.Interfaces", "DotNetBay.Interfaces\DotNetBay.Interfaces.csproj", "{17745E6C-337C-44BD-9C50-5F1D45CEADA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetBay.Core.Test", "DotNetBay.Core.Test\DotNetBay.Core.Test.csproj", "{9DFA662D-5CF3-43E6-88E1-61D4D1FE02AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetBay.Test", "DotNetBay.Test\DotNetBay.Test.csproj", "{9DFA662D-5CF3-43E6-88E1-61D4D1FE02AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

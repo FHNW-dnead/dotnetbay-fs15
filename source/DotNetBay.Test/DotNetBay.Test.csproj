@@ -6,8 +6,8 @@
     <ProjectGuid>{9DFA662D-5CF3-43E6-88E1-61D4D1FE02AD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DotNetBay.Core.Test</RootNamespace>
-    <AssemblyName>DotNetBay.Core.Test</AssemblyName>
+    <RootNamespace>DotNetBay.Test</RootNamespace>
+    <AssemblyName>DotNetBay.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
