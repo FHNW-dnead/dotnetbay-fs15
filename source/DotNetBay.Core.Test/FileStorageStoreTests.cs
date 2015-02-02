@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DotNetBay.Data.FileStorage;
 using DotNetBay.Model;
@@ -87,13 +88,46 @@ namespace DotNetBay.Core.Test
         }
 
         [TestMethod]
+        public void GivenAnEmptyStore_AddAMemberWithAuctions_MemberAndAuctionsAreStoredIndividually()
+        {
+            var myAuction = CreateAnAuction();
+            var myMember = CreateAMember();
+
+            // References
+            myAuction.Seller = myMember;
+            myMember.Auctions = new List<Auction>(new[] { myAuction });
+
+            Member memberForStore = null;
+            Auction auctionFromStore = null;
+
+            using (var tempFile = new TempFile())
+            {
+                var initStore = new FileStorageProvider(tempFile.FullPath);
+                initStore.Add(myMember);
+
+                var testStore = new FileStorageProvider(tempFile.FullPath);
+
+                memberForStore = testStore.GetMembers().FirstOrDefault();
+                auctionFromStore = testStore.GetAuctions().FirstOrDefault();
+            }
+
+            Assert.IsNotNull(memberForStore, "memberForStore != null");
+            Assert.IsNotNull(memberForStore.Auctions, "memberForStore.Auctions != null");
+            Assert.AreEqual(1, memberForStore.Auctions.Count, "There should be exact one euction for this member");
+
+            Assert.IsNotNull(auctionFromStore, "auctionFromStore != null");
+            Assert.IsNotNull(auctionFromStore.Seller, "auctionFromStore.Seller != null");
+            Assert.AreEqual(auctionFromStore.Seller.UniqueId, myMember.UniqueId);
+        }
+
+        [TestMethod]
         public void GivenAnExistingMember_AddAuctionWithExistingMemberAsSeller_AuctionIsAttachedToMember()
         {
             var myMember = CreateAMember();
             var myAuction = CreateAnAuction();
             myAuction.Seller = myMember;
 
-            Member memberFromStore = null;
+            IQueryable<Member> allMembersFromStore = null;
             IQueryable<Auction> allAuctionFromStore = null;
             
             using (var tempFile = new TempFile())
@@ -106,14 +140,17 @@ namespace DotNetBay.Core.Test
 
                 var testStore = new FileStorageProvider(tempFile.FullPath);
                 allAuctionFromStore = testStore.GetAuctions();
-                memberFromStore = testStore.GetMembers().FirstOrDefault();
+                allMembersFromStore = testStore.GetMembers();
             }
 
-            Assert.IsNotNull(memberFromStore, "memberForStore != null");
-            Assert.IsNotNull(memberFromStore.Auctions, "memberForStore.Auctions != null");
+            Assert.AreEqual(1, allAuctionFromStore.Count(), "There should be exact 1 auction");
+            Assert.AreEqual(1, allMembersFromStore.Count(), "There should be exact 1 member");
+
+            Assert.IsNotNull(allMembersFromStore, "memberForStore != null");
+            Assert.IsNotNull(allMembersFromStore.First().Auctions, "memberForStore.Auctions != null");
             
-            Assert.AreEqual(1, allAuctionFromStore.Count());
-            Assert.AreEqual(myAuction, memberFromStore.Auctions.First());
+            Assert.AreEqual(1, allMembersFromStore.First().Auctions.Count(), "There should be a auction attached to the member");
+            Assert.AreEqual(myAuction.Id, allMembersFromStore.First().Auctions.First().Id);
         }
     }
 }
