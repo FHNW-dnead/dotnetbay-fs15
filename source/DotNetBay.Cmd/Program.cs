@@ -14,7 +14,7 @@ namespace DotNetBay.Cmd
         {
             Console.WriteLine("DotNetBay Commandline");
 
-            var auctionService = new AuctionService(new FileStorageProvider("store.json"));
+            var auctionService = new AuctionService(new FileDataStore("store.json"));
 
             var allAuctions = auctionService.GetAllAuctions();
 

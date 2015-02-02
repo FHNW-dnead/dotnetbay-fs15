@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DotNetBay.Data.FileStorage;
+using DotNetBay.Interfaces;
 using DotNetBay.Model;
 using NUnit.Framework;
 
@@ -30,15 +30,9 @@ namespace DotNetBay.Test.Storage
             };
         }
 
-        private static Bid CreateABid()
-        {
-            return new Bid
-            {
-                Amount = 99.9,
-            };
-        }
-
         #endregion
+
+        protected abstract IDataStoreFactory CreateFactory();
 
         [TestCase]
         public void GivenAnEmptyStore_AddOneAuction_NotEmptyAnymore()
@@ -48,12 +42,12 @@ namespace DotNetBay.Test.Storage
 
             Auction auctionFromStore;
 
-            using (var tempFile = new TempFile())
+            using (var factory = this.CreateFactory())
             {
-                var initStore = new FileStorageProvider(tempFile.FullPath);
+                var initStore = factory.CreateStore();
                 initStore.Add(myAuction);
 
-                var testStore = new FileStorageProvider(tempFile.FullPath);
+                var testStore = factory.CreateStore();
 
                 auctionFromStore = testStore.GetAuctions().FirstOrDefault();
             }
@@ -72,12 +66,12 @@ namespace DotNetBay.Test.Storage
             Member memberFromStore;
             Auction auctionFromStore;
 
-            using (var tempFile = new TempFile())
+            using (var factory = this.CreateFactory())
             {
-                var initStore = new FileStorageProvider(tempFile.FullPath);
+                var initStore = factory.CreateStore();
                 initStore.Add(myAuction);
 
-                var testStore = new FileStorageProvider(tempFile.FullPath);
+                var testStore = factory.CreateStore();
 
                 auctionFromStore = testStore.GetAuctions().FirstOrDefault();
                 memberFromStore = testStore.GetMembers().FirstOrDefault();
@@ -108,12 +102,12 @@ namespace DotNetBay.Test.Storage
             Member memberForStore;
             Auction auctionFromStore;
 
-            using (var tempFile = new TempFile())
+            using (var factory = this.CreateFactory())
             {
-                var initStore = new FileStorageProvider(tempFile.FullPath);
+                var initStore = factory.CreateStore();
                 initStore.Add(myMember);
 
-                var testStore = new FileStorageProvider(tempFile.FullPath);
+                var testStore = factory.CreateStore();
 
                 memberForStore = testStore.GetMembers().FirstOrDefault();
                 auctionFromStore = testStore.GetAuctions().FirstOrDefault();
@@ -139,16 +133,16 @@ namespace DotNetBay.Test.Storage
 
             IQueryable<Member> allMembersFromStore;
             IQueryable<Auction> allAuctionsFromStore;
-            
-            using (var tempFile = new TempFile())
+
+            using (var factory = this.CreateFactory())
             {
-                var firstStore = new FileStorageProvider(tempFile.FullPath);
+                var firstStore = factory.CreateStore();
                 firstStore.Add(myMember);
 
-                var secondStore = new FileStorageProvider(tempFile.FullPath);
+                var secondStore = factory.CreateStore();
                 secondStore.Add(myAuction);
 
-                var testStore = new FileStorageProvider(tempFile.FullPath);
+                var testStore = factory.CreateStore();
                 allAuctionsFromStore = testStore.GetAuctions();
                 allMembersFromStore = testStore.GetMembers();
             }
@@ -182,9 +176,9 @@ namespace DotNetBay.Test.Storage
 
             List<Auction> allAuctionsFromStore;
 
-            using (var tempFile = new TempFile())
+            using (var factory = this.CreateFactory())
             {
-                var testStore = new FileStorageProvider(tempFile.FullPath);
+                var testStore = factory.CreateStore();
                 testStore.Add(myAuction);
                 testStore.Add(theBidder);
                 testStore.Add(aBid);
@@ -219,9 +213,9 @@ namespace DotNetBay.Test.Storage
 
             Bid retrievedBid;
 
-            using (var tempFile = new TempFile())
+            using (var factory = this.CreateFactory())
             {
-                var testStore = new FileStorageProvider(tempFile.FullPath);
+                var testStore = factory.CreateStore();
                 testStore.Add(theBidder);
                 testStore.Add(myAuction);
                 testStore.Add(aBid);
@@ -244,12 +238,12 @@ namespace DotNetBay.Test.Storage
             myAuction.Seller = myMember;
             myMember.Auctions = new List<Auction>(new[] { myAuction });
 
-            using (var tempFile = new TempFile())
+            using (var factory = this.CreateFactory())
             {
-                var firstStore = new FileStorageProvider(tempFile.FullPath);
+                var firstStore = factory.CreateStore();
                 firstStore.Add(myMember);
 
-                var testSore = new FileStorageProvider(tempFile.FullPath);
+                var testSore = factory.CreateStore();
                 testSore.Add(myMember);
             }
         }
@@ -265,12 +259,12 @@ namespace DotNetBay.Test.Storage
             myAuction.Seller = myMember;
             myMember.Auctions = new List<Auction>(new[] { myAuction });
 
-            using (var tempFile = new TempFile())
+            using (var factory = this.CreateFactory())
             {
-                var firstStore = new FileStorageProvider(tempFile.FullPath);
+                var firstStore = factory.CreateStore();
                 firstStore.Add(myAuction);
 
-                var testSore = new FileStorageProvider(tempFile.FullPath);
+                var testSore = factory.CreateStore();
                 testSore.Add(myAuction);
             }
         }
@@ -288,12 +282,12 @@ namespace DotNetBay.Test.Storage
             IQueryable<Member> allMembersFromStore;
             IQueryable<Auction> allAuctionFromStore;
 
-            using (var tempFile = new TempFile())
+            using (var factory = this.CreateFactory())
             {
-                var firstStore = new FileStorageProvider(tempFile.FullPath);
+                var firstStore = factory.CreateStore();
                 firstStore.Add(myAuction);
 
-                var testStore = new FileStorageProvider(tempFile.FullPath);
+                var testStore = factory.CreateStore();
                 allAuctionFromStore = testStore.GetAuctions();
                 allMembersFromStore = testStore.GetMembers();
             }

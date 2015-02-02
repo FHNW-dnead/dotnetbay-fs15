@@ -4,7 +4,7 @@ using DotNetBay.Model;
 
 namespace DotNetBay.Interfaces
 {
-    public interface IStorageProvider
+    public interface IDataStore
     {
         IQueryable<Auction> GetAuctions();
         IQueryable<Member> GetMembers();
@@ -15,5 +15,6 @@ namespace DotNetBay.Interfaces
         Bid Add(Bid bid);
 
         Bid GetBidByTransactionId(Guid transactionId);
+        Member Add(Member member);
     }
 }

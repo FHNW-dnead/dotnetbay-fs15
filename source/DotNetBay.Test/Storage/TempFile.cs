@@ -1,11 +1,11 @@
 using System;
 using System.IO;
 
-namespace DotNetBay.Test
+namespace DotNetBay.Test.Storage
 {
     public class TempFile : IDisposable
     {
-        private string fullPath;
+        private readonly string fullPath;
 
         public string FullPath {
             get { return this.fullPath; }

@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace DotNetBay.Data.FileStorage
 {
-    public class FileStorageProvider : IStorageProvider
+    public class FileDataStore : IDataStore
     {
         // Poor-Mans locking mechanism
         private readonly object syncRoot = new object();
@@ -19,7 +19,7 @@ namespace DotNetBay.Data.FileStorage
         private DataRootElement data;
         private readonly JsonSerializerSettings jsonSerializerSettings;
 
-        public FileStorageProvider(string fileName)
+        public FileDataStore(string fileName)
         {
             // It's good practice to expect either absolute or relative paths and handle both the same
             this.fullPath = Path.GetFullPath(fileName);
@@ -42,14 +42,7 @@ namespace DotNetBay.Data.FileStorage
 
             var restored = JsonConvert.DeserializeObject<DataRootElement>(content, this.jsonSerializerSettings);
 
-            if (restored != null)
-            {
-                this.data = restored;
-            }
-            else
-            {
-                this.data = new DataRootElement();
-            }
+            this.data = restored ?? new DataRootElement();
 
             this.isLoaded = true;
         }
