@@ -158,6 +158,7 @@ namespace DotNetBay.Test.Storage
             using (var factory = this.CreateFactory())
             {
                 var testStore = factory.CreateStore();
+                
                 testStore.Add(myAuction);
                 testStore.Add(theBidder);
                 testStore.Add(bid);
