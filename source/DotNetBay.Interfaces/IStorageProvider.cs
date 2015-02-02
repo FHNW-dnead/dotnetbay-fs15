@@ -14,6 +14,6 @@ namespace DotNetBay.Interfaces
         
         Bid Add(Bid bid);
 
-        Bid GetBid(Guid transactionId);
+        Bid GetBidByTransactionId(Guid transactionId);
     }
 }

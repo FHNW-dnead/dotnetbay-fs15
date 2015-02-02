@@ -210,7 +210,7 @@ namespace DotNetBay.Data.FileStorage
             }
         }
 
-        public Bid GetBid(Guid transactionId)
+        public Bid GetBidByTransactionId(Guid transactionId)
         {
             lock (this.syncRoot)
             {
