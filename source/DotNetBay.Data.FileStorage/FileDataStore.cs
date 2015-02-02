@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Runtime.InteropServices;
+
 using DotNetBay.Interfaces;
 using DotNetBay.Model;
+
 using Newtonsoft.Json;
 
 namespace DotNetBay.Data.FileStorage
@@ -20,11 +20,15 @@ namespace DotNetBay.Data.FileStorage
         private bool isLoaded;
 
         private DataRootElement data;
+        private readonly string rootDirectory;
+        private string dataPath;
 
         public FileDataStore(string fileName)
         {
             // It's good practice to expect either absolute or relative paths and handle both the same
             this.fullPath = Path.GetFullPath(fileName);
+            this.rootDirectory = Path.GetDirectoryName(this.fullPath);
+            this.dataPath = Path.Combine(this.rootDirectory, "fileContent");
 
             this.jsonSerializerSettings = new JsonSerializerSettings
             {
@@ -128,13 +132,24 @@ namespace DotNetBay.Data.FileStorage
                     throw new ApplicationException("This auction does not exist and cannot be updated!");
                 }
 
-                //// TODO: Fail if the references are not the same
+                // Check References
+                this.ThrowIfReferenceNotFound(auction, x => x.Bids, this.data.Bids, r => r.Id);
+                this.ThrowIfReferenceNotFound(auction, x => x.Seller, this.data.Members, r => r.UniqueId);
+                this.ThrowIfReferenceNotFound(auction, x => x.Winner, this.data.Members, r => r.UniqueId);
 
-                //// TODO Update 
+                foreach (var bid in auction.Bids)
+                {
+                    bid.Auction = auction;
 
-                //// TODO Handle Bids (references, add to other list)
+                    if (!this.data.Bids.Contains(bid))
+                    {
+                        this.data.Bids.Add(bid);
+                    }
+                }
 
-                return null;
+                this.Save();
+
+                return auction;
             }
         }
 
@@ -215,6 +230,11 @@ namespace DotNetBay.Data.FileStorage
 
         protected virtual void AfterLoad()
         {
+            // Reload Images from FS
+            foreach (var auction in this.data.Auctions)
+            {
+                auction.Image = this.LoadBinary(string.Format("auction-{0}-image1.jpg", auction.Id));
+            }
         }
 
         protected void BeforeLoad()
@@ -223,10 +243,54 @@ namespace DotNetBay.Data.FileStorage
 
         protected void AfterSave()
         {
+            // Reload Images from FS
+            foreach (var auction in this.data.Auctions)
+            {
+                auction.Image = this.LoadBinary(string.Format("auction-{0}-image1.jpg", auction.Id));
+            }
         }
 
         protected void BeforeSave()
         {
+            // Remove byte values from images and save individually
+            foreach (var auction in this.data.Auctions)
+            {
+                this.SaveBinary(string.Format("auction-{0}-image1.jpg", auction.Id), auction.Image);
+                auction.Image = null;
+            }
+        }
+
+        private void SaveBinary(string fileName, byte[] fileContent)
+        {
+            var fullFileName = Path.Combine(this.rootDirectory, fileName);
+
+            if (fileContent == null)
+            {
+                try
+                {
+                    File.Delete(fullFileName);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+            else
+            {
+                File.WriteAllBytes(fullFileName, fileContent);
+            }
+        }
+
+        private byte[] LoadBinary(string fileName)
+        {
+            var fullFileName = Path.Combine(this.rootDirectory, fileName);
+
+            if (File.Exists(fullFileName))
+            {
+                return File.ReadAllBytes(fullFileName);
+            }
+
+            return null;
         }
 
         private void ThrowIfReferenceNotFound<T, R>(T obj, Func<T, List<R>> accessor, List<R> validInstances, Func<R, object> resolver)
@@ -266,34 +330,46 @@ namespace DotNetBay.Data.FileStorage
 
         private void Load()
         {
-            this.BeforeLoad();
-
-            if (!File.Exists(this.fullPath))
+            lock (this.syncRoot)
             {
-                var file = File.Create(this.fullPath);
-                file.Close();
+                // Ensure existence of directory
+                Directory.CreateDirectory(this.rootDirectory);
+
+                this.BeforeLoad();
+
+                if (!File.Exists(this.fullPath))
+                {
+                    var file = File.Create(this.fullPath);
+                    file.Close();
+                }
+
+                var content = File.ReadAllText(this.fullPath);
+
+                var restored = JsonConvert.DeserializeObject<DataRootElement>(content, this.jsonSerializerSettings);
+
+                this.data = restored ?? new DataRootElement();
+
+                this.isLoaded = true;
+
+                this.AfterLoad();
             }
-
-            var content = File.ReadAllText(this.fullPath);
-
-            var restored = JsonConvert.DeserializeObject<DataRootElement>(content, this.jsonSerializerSettings);
-
-            this.data = restored ?? new DataRootElement();
-
-            this.isLoaded = true;
-
-            this.AfterLoad();
         }
 
         private void Save()
         {
-            this.BeforeSave();
+            lock (this.syncRoot)
+            {
+                // Ensure existence of directory
+                Directory.CreateDirectory(this.rootDirectory);
 
-            var content = JsonConvert.SerializeObject(this.data, this.jsonSerializerSettings);
+                this.BeforeSave();
 
-            File.WriteAllText(this.fullPath, content);
+                var content = JsonConvert.SerializeObject(this.data, this.jsonSerializerSettings);
 
-            this.AfterSave();
+                File.WriteAllText(this.fullPath, content);
+
+                this.AfterSave();
+            }
         }
 
         private void EnsureCompleteLoaded()

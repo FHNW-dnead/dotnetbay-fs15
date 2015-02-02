@@ -1,3 +1,4 @@
+using System.IO;
 using DotNetBay.Data.FileStorage;
 using DotNetBay.Interfaces;
 
@@ -12,21 +13,21 @@ namespace DotNetBay.Test.Storage
 
         public class TempFileDataStoreFactory : IDataStoreFactory
         {
-            private readonly TempFile tempFile;
+            private readonly TempDirectory tempDirectory;
 
             public TempFileDataStoreFactory()
             {
-                this.tempFile = new TempFile();
+                this.tempDirectory = new TempDirectory();
             }
 
             public void Dispose()
             {
-                this.tempFile.Dispose();
+                this.tempDirectory.Dispose();
             }
 
             public IDataStore CreateStore()
             {
-                return new FileDataStore(this.tempFile.FullPath);
+                return new FileDataStore(Path.Combine(this.tempDirectory.Root, "data.json"));
             }
         }
     }

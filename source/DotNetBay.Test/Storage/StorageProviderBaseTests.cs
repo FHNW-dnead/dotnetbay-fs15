@@ -315,6 +315,59 @@ namespace DotNetBay.Test.Storage
             Assert.AreEqual(allMembersFromStore.FirstOrDefault().Auctions.FirstOrDefault(), allAuctionFromStore.FirstOrDefault());
         }
 
+        [TestCase]
+        public void AuctionWithImage_IsSavedInStore_CanBeRetrievedAfterwards()
+        {
+            var myMember = CreateAMember();
+            var myAuction = CreateAnAuction();
+            myAuction.Seller = myMember;
+
+            var myImage = Guid.NewGuid().ToByteArray();
+            myAuction.Image = myImage;
+
+            byte[] imageFromStore;
+
+            using (var factory = this.CreateFactory())
+            {
+                var firstStore = factory.CreateStore();
+                firstStore.Add(myAuction);
+
+                var testStore = factory.CreateStore();
+                imageFromStore = testStore.GetAuctions().First().Image;
+            }
+
+            Assert.AreEqual(myImage, imageFromStore);
+        }
+
+        [TestCase]
+        public void AuctionWithImage_IsUpdatedWithNoImage_ImageIsGone()
+        {
+            var myMember = CreateAMember();
+            var myAuction = CreateAnAuction();
+            myAuction.Seller = myMember;
+
+            var myImage = Guid.NewGuid().ToByteArray();
+            myAuction.Image = myImage;
+
+            byte[] imageFromStore;
+
+            using (var factory = this.CreateFactory())
+            {
+                var firstStore = factory.CreateStore();
+                firstStore.Add(myAuction);
+
+                var secondStore = factory.CreateStore();
+                var auctionFromStore = secondStore.GetAuctions().First();
+                auctionFromStore.Image = null;
+                secondStore.Update(auctionFromStore);
+
+                var testStore = factory.CreateStore();
+                imageFromStore = testStore.GetAuctions().First().Image;
+            }
+
+            Assert.IsNull(imageFromStore);
+        }
+
         protected abstract IDataStoreFactory CreateFactory();
 
         #region Create Helpers

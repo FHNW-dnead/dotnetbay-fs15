@@ -50,6 +50,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Storage\FileStorageProviderTests.cs" />
+    <Compile Include="Storage\TempDirectory.cs" />
     <Compile Include="Storage\TempFile.cs" />
     <Compile Include="Storage\StorageProviderBaseTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
