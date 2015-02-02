@@ -16,11 +16,11 @@ namespace DotNetBay.Data.FileStorage
         private readonly object syncRoot = new object();
         private readonly string fullPath;
         private readonly JsonSerializerSettings jsonSerializerSettings;
+        private readonly string rootDirectory;
 
         private bool isLoaded;
 
         private DataRootElement data;
-        private readonly string rootDirectory;
         private string dataPath;
 
         public FileDataStore(string fileName)
@@ -293,17 +293,21 @@ namespace DotNetBay.Data.FileStorage
             return null;
         }
 
-        private void ThrowIfReferenceNotFound<T, R>(T obj, Func<T, List<R>> accessor, List<R> validInstances, Func<R, object> resolver)
+        private void ThrowIfReferenceNotFound<TRootElementType, TNavigationElementType>(
+            TRootElementType obj,
+            Func<TRootElementType, List<TNavigationElementType>> navigationAccessor,
+            IEnumerable<TNavigationElementType> validInstances,
+            Func<TNavigationElementType, object> identificationAccessor)
         {
-            var value = accessor(obj);
+            var value = navigationAccessor(obj);
 
             if (value == null)
             {
                 return;
             }
 
-            var referencedElementsToTest = value.Where(x => validInstances.Any(r => resolver(r) == resolver(x)));
-            var resolvedElementsById = validInstances.Where(x => referencedElementsToTest.Any(r => resolver(r) == resolver(x)));
+            var referencedElementsToTest = value.Where(x => validInstances.Any(r => identificationAccessor(r) == identificationAccessor(x)));
+            var resolvedElementsById = validInstances.Where(x => referencedElementsToTest.Any(r => identificationAccessor(r) == identificationAccessor(x)));
 
             if (referencedElementsToTest.Any(element => !resolvedElementsById.Contains(element)))
             {
@@ -311,16 +315,20 @@ namespace DotNetBay.Data.FileStorage
             }
         }
 
-        private void ThrowIfReferenceNotFound<T, R>(T obj, Func<T, R> accessor, List<R> validInstances, Func<R, object> resolver) where R: class
+        private void ThrowIfReferenceNotFound<TRootElementType, TNavigationElementType>(
+            TRootElementType obj,
+            Func<TRootElementType, TNavigationElementType> navigationAccessor,
+            IEnumerable<TNavigationElementType> validInstances,
+            Func<TNavigationElementType, object> identificationAccessor) where TNavigationElementType : class
         {
-            var referencedElement = accessor(obj);
+            var referencedElement = navigationAccessor(obj);
 
             if (referencedElement == null)
             {
                 return;
             }
 
-            var resolvedElementById = validInstances.FirstOrDefault(x => resolver(x) == resolver(referencedElement));
+            var resolvedElementById = validInstances.FirstOrDefault(x => identificationAccessor(x) == identificationAccessor(referencedElement));
 
             if (referencedElement != resolvedElementById)
             {

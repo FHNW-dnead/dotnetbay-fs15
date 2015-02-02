@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+
 using DotNetBay.Interfaces;
 using DotNetBay.Model;
+
 using NUnit.Framework;
 
 namespace DotNetBay.Test.Storage
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "This are testclasses")]
     public abstract class StorageProviderBaseTests
     {
         [TestCase]
