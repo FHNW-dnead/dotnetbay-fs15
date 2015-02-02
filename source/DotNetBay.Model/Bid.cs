@@ -6,9 +6,9 @@ namespace DotNetBay.Model
     {
         public long Id { get; set; }
 
-        public DateTime ReceivedOnUtc { get; private set; }
+        public DateTime ReceivedOnUtc { get; set; }
 
-        public Guid TransactionId { get; private set; }
+        public Guid TransactionId { get; set; }
 
         public Auction Auction { get; set; }
 
@@ -20,7 +20,6 @@ namespace DotNetBay.Model
 
         public Bid()
         {
-            this.ReceivedOnUtc = DateTime.UtcNow;
             this.TransactionId = new Guid();
         }
     }

@@ -5,7 +5,7 @@ using DotNetBay.Data.FileStorage;
 using DotNetBay.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace DotNetBay.Core.Test
+namespace DotNetBay.Test
 {
     [TestClass]
     public class FileStorageStoreTests
@@ -14,14 +14,12 @@ namespace DotNetBay.Core.Test
 
         private static Auction CreateAnAuction()
         {
-            var myAuction = new Auction()
+            return new Auction()
             {
                 Title = "TitleOfTheAuction",
                 StartPrice = 50.5,
                 StartDateTimeUtc = DateTime.UtcNow.AddDays(10),
             };
-
-            return myAuction;
         }
 
         private static Member CreateAMember()
@@ -33,6 +31,13 @@ namespace DotNetBay.Core.Test
             };
         }
 
+        private static Bid CreateABid()
+        {
+            return new Bid
+            {
+                Amount = 99.9,
+            };
+        }
 
         #endregion
 
@@ -134,7 +139,7 @@ namespace DotNetBay.Core.Test
             myAuction.Seller = myMember;
 
             IQueryable<Member> allMembersFromStore;
-            IQueryable<Auction> allAuctionFromStore;
+            IQueryable<Auction> allAuctionsFromStore;
             
             using (var tempFile = new TempFile())
             {
@@ -145,11 +150,11 @@ namespace DotNetBay.Core.Test
                 secondStore.Add(myAuction);
 
                 var testStore = new FileStorageProvider(tempFile.FullPath);
-                allAuctionFromStore = testStore.GetAuctions();
+                allAuctionsFromStore = testStore.GetAuctions();
                 allMembersFromStore = testStore.GetMembers();
             }
 
-            Assert.AreEqual(1, allAuctionFromStore.Count(), "There should be exact 1 auction");
+            Assert.AreEqual(1, allAuctionsFromStore.Count(), "There should be exact 1 auction");
             Assert.AreEqual(1, allMembersFromStore.Count(), "There should be exact 1 member");
 
             Assert.IsNotNull(allMembersFromStore, "memberForStore != null");
@@ -157,6 +162,44 @@ namespace DotNetBay.Core.Test
             
             Assert.AreEqual(1, allMembersFromStore.First().Auctions.Count(), "There should be a auction attached to the member");
             Assert.AreEqual(myAuction.Id, allMembersFromStore.First().Auctions.First().Id);
+        }
+
+        [TestMethod]
+        public void GivenAStoreWithAuctionAndMember_AddBid_BidGetsListedInAuction()
+        {
+            var theSeller = CreateAMember();
+            var myAuction = CreateAnAuction();
+            
+            // References
+            myAuction.Seller = theSeller;
+
+            var theBidder = CreateAMember();
+            var aBid = new Bid()
+            {
+                Auction = myAuction,
+                Bidder = theBidder,
+                Amount = 12
+            };
+
+            List<Auction> allAuctionsFromStore;
+
+            using (var tempFile = new TempFile())
+            {
+                var testStore = new FileStorageProvider(tempFile.FullPath);
+                testStore.Add(theBidder);
+                testStore.Add(myAuction);
+
+                testStore.Add(aBid);
+
+                allAuctionsFromStore = testStore.GetAuctions().ToList();
+            }
+
+            // Sanity check
+            Assert.AreEqual(1, allAuctionsFromStore.Count());
+            Assert.IsNotNull(allAuctionsFromStore[0].Bids);
+
+            Assert.AreEqual(1, allAuctionsFromStore[0].Bids.Count);
+            Assert.AreEqual(aBid, allAuctionsFromStore[0].Bids[0]);
         }
 
         [TestMethod]

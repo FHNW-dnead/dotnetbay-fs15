@@ -169,11 +169,42 @@ namespace DotNetBay.Data.FileStorage
 
         public Bid Add(Bid bid)
         {
+            if (bid.Bidder == null)
+            {
+                throw new ArgumentException("Its required to set a bidder");
+            }
+
+            if (bid.Auction == null)
+            {
+                throw new ArgumentException("Its required to set an auction");
+            }
+
             lock (this.syncRoot)
             {
                 this.EnsureCompleteLoaded();
 
-                // TODO: Add
+                // Does the auction exist?
+                if (this.data.Auctions.All(a => a.Id != bid.Auction.Id))
+                {
+                    throw new ApplicationException("This auction does not exist an cannot be added this way!");
+                }
+
+                // Does the member exist?
+                if (this.data.Members.All(a => a.UniqueId != bid.Bidder.UniqueId))
+                {
+                    throw new ApplicationException("the bidder does not exist and cannot be added this way!");
+                }
+
+                var maxId = this.data.Bids.Any() ? this.data.Bids.Max(a => a.Id) : 0;
+                bid.Id = maxId + 1;
+                bid.Accepted = null;
+                bid.TransactionId = Guid.NewGuid();
+                
+                this.data.Bids.Add(bid);
+
+                // Reference back from auction
+                var auction = this.data.Auctions.FirstOrDefault(a => a.Id == bid.Auction.Id);
+                auction.Bids.Add(bid);
 
                 return null;
             }
