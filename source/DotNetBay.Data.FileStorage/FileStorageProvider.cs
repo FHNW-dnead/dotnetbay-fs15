@@ -139,17 +139,29 @@ namespace DotNetBay.Data.FileStorage
 
                 this.Save();
 
-                return null;
+                return member;
             }
         }
 
         public Auction Update(Auction auction)
         {
+            if (auction.Seller == null)
+            {
+                throw new ArgumentException("Its required to set a seller");
+            }
+
             lock (this.syncRoot)
             {
                 this.EnsureCompleteLoaded();
 
-                // TODO Update
+                if (this.data.Auctions.All(a => a.Id != auction.Id))
+                {
+                    throw new ApplicationException("This auction does not exist and cannot be updated!");
+                }
+
+                // TODO Update 
+
+                // TODO Handle Bids (references, add to other list)
 
                 return null;
             }
