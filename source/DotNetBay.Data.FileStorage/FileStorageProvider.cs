@@ -124,7 +124,7 @@ namespace DotNetBay.Data.FileStorage
 
                 if (this.data.Members.Any(m=> m.UniqueId == member.UniqueId))
                 {
-                    throw new ArgumentException("A member with this unique id already exists");
+                    throw new ArgumentException("A member with the same uniqueId already exists!");
                 }
 
                 this.data.Members.Add(member);
