@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using DotNetBay.Data.FileStorage;
 using DotNetBay.Model;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
-namespace DotNetBay.Test
+namespace DotNetBay.Test.Storage
 {
-    [TestClass]
-    public class FileStorageStoreTests
+    public abstract class StorageProviderBaseTests
     {
         #region Create Helpers
 
@@ -41,7 +40,7 @@ namespace DotNetBay.Test
 
         #endregion
 
-        [TestMethod]
+        [TestCase]
         public void GivenAnEmptyStore_AddOneAuction_NotEmptyAnymore()
         {
             var myAuction = CreateAnAuction();
@@ -62,7 +61,7 @@ namespace DotNetBay.Test
             Assert.IsNotNull(auctionFromStore);
         }
 
-        [TestMethod]
+        [TestCase]
         public void GivenEmptyStore_AddAuctionWithSeller_AuctionAndMemberAreStoredIndividually()
         {
             var myAuction = CreateAnAuction();
@@ -96,7 +95,7 @@ namespace DotNetBay.Test
             Assert.AreEqual(1, memberFromStore.Auctions.Count, "There should be exact one euction for this member");
         }
 
-        [TestMethod]
+        [TestCase]
         public void GivenEmptyStore_AddAMemberWithAuctions_MemberAndAuctionsAreStoredIndividually()
         {
             var myAuction = CreateAnAuction();
@@ -129,7 +128,7 @@ namespace DotNetBay.Test
             Assert.AreEqual(auctionFromStore.Seller.UniqueId, myMember.UniqueId);
         }
 
-        [TestMethod]
+        [TestCase]
         public void GivenAnExistingMember_AddAuctionWithExistingMemberAsSeller_AuctionIsAttachedToMember()
         {
             var myMember = CreateAMember();
@@ -164,7 +163,7 @@ namespace DotNetBay.Test
             Assert.AreEqual(myAuction.Id, allMembersFromStore.First().Auctions.First().Id);
         }
 
-        [TestMethod]
+        [TestCase]
         public void GivenAStoreWithAuctionAndMember_AddBid_BidGetsListedInAuction()
         {
             var theSeller = CreateAMember();
@@ -186,9 +185,8 @@ namespace DotNetBay.Test
             using (var tempFile = new TempFile())
             {
                 var testStore = new FileStorageProvider(tempFile.FullPath);
-                testStore.Add(theBidder);
                 testStore.Add(myAuction);
-
+                testStore.Add(theBidder);
                 testStore.Add(aBid);
 
                 allAuctionsFromStore = testStore.GetAuctions().ToList();
@@ -202,8 +200,41 @@ namespace DotNetBay.Test
             Assert.AreEqual(aBid, allAuctionsFromStore[0].Bids[0]);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof (ArgumentException))]
+        [TestCase]
+        public void GivenAStoreWithAuctionAndMember_AddBid_RetrievedByTransactionId()
+        {
+            var theSeller = CreateAMember();
+            var myAuction = CreateAnAuction();
+
+            // References
+            myAuction.Seller = theSeller;
+
+            var theBidder = CreateAMember();
+            var aBid = new Bid()
+            {
+                Auction = myAuction,
+                Bidder = theBidder,
+                Amount = 12
+            };
+
+            Bid retrievedBid;
+
+            using (var tempFile = new TempFile())
+            {
+                var testStore = new FileStorageProvider(tempFile.FullPath);
+                testStore.Add(theBidder);
+                testStore.Add(myAuction);
+                testStore.Add(aBid);
+
+                retrievedBid = testStore.GetBidByTransactionId(aBid.TransactionId);
+            }
+
+            Assert.IsNotNull(retrievedBid);
+            Assert.AreEqual(aBid, retrievedBid);
+        }
+
+        [TestCase]
+        [ExpectedException(typeof(ArgumentException))]
         public void GivenAStoreWithMember_AddMemberAgain_ShouldRaiseExecption()
         {
             var myAuction = CreateAnAuction();
@@ -223,7 +254,7 @@ namespace DotNetBay.Test
             }
         }
 
-        [TestMethod]
+        [TestCase]
         [ExpectedException(typeof(ArgumentException))]
         public void GivenAStoreWithAuction_AddAuctionAgain_ShouldRaiseExecption()
         {
@@ -244,7 +275,7 @@ namespace DotNetBay.Test
             }
         }
 
-        [TestMethod]
+        [TestCase]
         public void GivenAnEmptyStore_AddAuctionAndMember_ReferencesShouldBeEqual()
         {
             var myMember = CreateAMember();

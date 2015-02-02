@@ -86,6 +86,8 @@ namespace DotNetBay.Data.FileStorage
                     throw new ArgumentException("The auction is already stored");
                 }
 
+                // TODO: Fail if the references are not the same
+
                 var maxId = this.data.Auctions.Any() ? this.data.Auctions.Max(a => a.Id) : 0;
 
                 auction.Id = maxId + 1;
@@ -127,6 +129,8 @@ namespace DotNetBay.Data.FileStorage
                     throw new ArgumentException("A member with the same uniqueId already exists!");
                 }
 
+                // TODO: Fail if the references are not the same
+
                 this.data.Members.Add(member);
 
                 if (member.Auctions != null && member.Auctions.Any())
@@ -158,6 +162,8 @@ namespace DotNetBay.Data.FileStorage
                 {
                     throw new ApplicationException("This auction does not exist and cannot be updated!");
                 }
+
+                // TODO: Fail if the references are not the same
 
                 // TODO Update 
 
@@ -194,6 +200,8 @@ namespace DotNetBay.Data.FileStorage
                 {
                     throw new ApplicationException("the bidder does not exist and cannot be added this way!");
                 }
+
+                // TODO: Fail if the references are not the same
 
                 var maxId = this.data.Bids.Any() ? this.data.Bids.Max(a => a.Id) : 0;
                 bid.Id = maxId + 1;
