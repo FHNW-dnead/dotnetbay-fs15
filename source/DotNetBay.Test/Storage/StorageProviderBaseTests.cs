@@ -103,9 +103,6 @@ namespace DotNetBay.Test.Storage
             var myMember = CreateAMember();
             var myAuction = CreateAnAuction();
 
-            // References
-            myAuction.Seller = myMember;
-
             IQueryable<Member> allMembersFromStore;
             IQueryable<Auction> allAuctionsFromStore;
 
@@ -115,6 +112,9 @@ namespace DotNetBay.Test.Storage
                 firstStore.Add(myMember);
 
                 var secondStore = factory.CreateStore();
+
+                // References
+                myAuction.Seller = secondStore.GetMembers().FirstOrDefault();
                 secondStore.Add(myAuction);
 
                 var testStore = factory.CreateStore();
@@ -217,9 +217,7 @@ namespace DotNetBay.Test.Storage
             {
                 var firstStore = factory.CreateStore();
                 firstStore.Add(myMember);
-
-                var testSore = factory.CreateStore();
-                testSore.Add(myMember);
+                firstStore.Add(myMember);
             }
         }
 
@@ -236,11 +234,54 @@ namespace DotNetBay.Test.Storage
 
             using (var factory = this.CreateFactory())
             {
+                var testStore = factory.CreateStore();
+                testStore.Add(myAuction);
+                testStore.Add(myAuction);
+            }
+        }
+
+        [TestCase]
+        [ExpectedException(typeof(Exception))]
+        public void GivenEmptyStore_AddAuctionAndMemberFromOtherInstance_ShouldRaiseException()
+        {
+            var myAuction = CreateAnAuction();
+            var myMember = CreateAMember();
+
+            // References
+            myAuction.Seller = myMember;
+            myMember.Auctions = new List<Auction>(new[] { myAuction });
+
+            using (var factory = this.CreateFactory())
+            {
                 var firstStore = factory.CreateStore();
                 firstStore.Add(myAuction);
 
+                var testStore = factory.CreateStore();
+                testStore.Add(myAuction);
+            }
+        }
+
+        [TestCase]
+        [ExpectedException(typeof(Exception))]
+        public void GivenEmptyStore_AddMemberWithAuctionsFromOtherInstance_ShouldRaiseException()
+        {
+            var myAuction = CreateAnAuction();
+            var myMember = CreateAMember();
+            var otherMember = CreateAMember();
+
+            // References
+            myAuction.Seller = myMember;
+            myMember.Auctions = new List<Auction>(new[] { myAuction });
+            
+            otherMember.Auctions = new List<Auction>(new[] { myAuction });
+
+            using (var factory = this.CreateFactory())
+            {
+                var firstStore = factory.CreateStore();
+                firstStore.Add(myMember);
+
                 var testSore = factory.CreateStore();
-                testSore.Add(myAuction);
+                testSore.Add(otherMember);
             }
         }
 

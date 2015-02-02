@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using DotNetBay.Interfaces;
 using DotNetBay.Model;
 using Newtonsoft.Json;
@@ -41,20 +43,7 @@ namespace DotNetBay.Data.FileStorage
             {
                 this.EnsureCompleteLoaded();
 
-                if (this.data.Auctions.Any(a => a.Id == auction.Id))
-                {
-                    throw new ArgumentException("The auction is already stored");
-                }
-
-                //// TODO: Fail if the references are not the same
-
-                var maxId = this.data.Auctions.Any() ? this.data.Auctions.Max(a => a.Id) : 0;
-
-                auction.Id = maxId + 1;
-
-                this.data.Auctions.Add(auction);
-
-                // Find the member in "store"
+                // Add Member (from Seller) if not yet exists
                 var seller = this.data.Members.FirstOrDefault(m => m.UniqueId == auction.Seller.UniqueId);
 
                 // Create member as seller if not exists
@@ -65,6 +54,21 @@ namespace DotNetBay.Data.FileStorage
                     seller.Auctions = new List<Auction>(new[] { auction });
                     this.data.Members.Add(seller);
                 }
+
+                // Check References
+                this.ThrowIfReferenceNotFound(auction, x => x.Bids, this.data.Bids, r => r.Id);
+                this.ThrowIfReferenceNotFound(auction, x => x.Seller, this.data.Members, r => r.UniqueId);
+                this.ThrowIfReferenceNotFound(auction, x => x.Winner, this.data.Members, r => r.UniqueId);
+
+                if (this.data.Auctions.Any(a => a.Id == auction.Id))
+                {
+                    throw new ArgumentException("The auction is already stored");
+                }
+
+                var maxId = this.data.Auctions.Any() ? this.data.Auctions.Max(a => a.Id) : 0;
+                auction.Id = maxId + 1;
+
+                this.data.Auctions.Add(auction);
 
                 // Add auction to sellers list of auctions
                 if (seller.Auctions.All(a => a.Id != auction.Id))
@@ -89,9 +93,10 @@ namespace DotNetBay.Data.FileStorage
                     throw new ArgumentException("A member with the same uniqueId already exists!");
                 }
 
-                //// TODO: Fail if the references are not the same
-
                 this.data.Members.Add(member);
+
+                this.ThrowIfReferenceNotFound(member, x => x.Auctions, this.data.Auctions, r => r.Id);
+                this.ThrowIfReferenceNotFound(member, x => x.Bids, this.data.Bids, r => r.Id);
 
                 if (member.Auctions != null && member.Auctions.Any())
                 {
@@ -205,6 +210,41 @@ namespace DotNetBay.Data.FileStorage
                 this.EnsureCompleteLoaded();
 
                 return this.data.Members.AsQueryable();
+            }
+        }
+
+        private void ThrowIfReferenceNotFound<T, R>(T obj, Func<T, List<R>> accessor, List<R> validInstances, Func<R, object> resolver)
+        {
+            var value = accessor(obj);
+
+            if (value == null)
+            {
+                return;
+            }
+
+            var referencedElementsToTest = value.Where(x => validInstances.Any(r => resolver(r) == resolver(x)));
+            var resolvedElementsById = validInstances.Where(x => referencedElementsToTest.Any(r => resolver(r) == resolver(x)));
+
+            if (referencedElementsToTest.Any(element => !resolvedElementsById.Contains(element)))
+            {
+                throw new Exception("Unable to process objects across contexts!");
+            }
+        }
+
+        private void ThrowIfReferenceNotFound<T, R>(T obj, Func<T, R> accessor, List<R> validInstances, Func<R, object> resolver) where R: class
+        {
+            var referencedElement = accessor(obj);
+
+            if (referencedElement == null)
+            {
+                return;
+            }
+
+            var resolvedElementById = validInstances.FirstOrDefault(x => resolver(x) == resolver(referencedElement));
+
+            if (referencedElement != resolvedElementById)
+            {
+                throw new Exception("Unable to process objects across contexts!");
             }
         }
 
