@@ -2,18 +2,18 @@ using DotNetBay.Interfaces;
 
 namespace DotNetBay.Data.FileStorage
 {
-    public class FileDataStoreFactory : IDataStoreFactory
+    public class FileSystemRepositoryFactory : IRepositoryFactory
     {
         private readonly string fileName;
 
-        public FileDataStoreFactory(string fileName)
+        public FileSystemRepositoryFactory(string fileName)
         {
             this.fileName = fileName;
         }
 
-        public IDataStore CreateStore()
+        public IMainRepository CreateMainRepository()
         {
-            return new FileDataStore(this.fileName);
+            return new FileSystemMainRepository(this.fileName);
         }
 
         public void Dispose()

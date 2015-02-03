@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace DotNetBay.Data.FileStorage
 {
-    public class FileDataStore : IDataStore
+    public class FileSystemMainRepository : IMainRepository
     {
         // Poor-Mans locking mechanism
         private readonly object syncRoot = new object();
@@ -23,7 +23,7 @@ namespace DotNetBay.Data.FileStorage
         private DataRootElement data;
         private string dataPath;
 
-        public FileDataStore(string fileName)
+        public FileSystemMainRepository(string fileName)
         {
             // It's good practice to expect either absolute or relative paths and handle both the same
             this.fullPath = Path.GetFullPath(fileName);

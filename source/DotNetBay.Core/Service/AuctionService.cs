@@ -7,11 +7,11 @@ namespace DotNetBay.Core.Service
 {
     public class AuctionService : IAuctionService
     {
-        private readonly IDataStore dataStore;
+        private readonly IMainRepository mainRepository;
 
-        public AuctionService(IDataStore dataStore)
+        public AuctionService(IMainRepository mainRepository)
         {
-            this.dataStore = dataStore;
+            this.mainRepository = mainRepository;
         }
 
         public Auction GetAuctionById(long id)
@@ -21,22 +21,22 @@ namespace DotNetBay.Core.Service
 
         public IQueryable<Auction> GetAuctions()
         {
-            return this.dataStore.GetAuctions();
+            return this.mainRepository.GetAuctions();
         }
 
         public Auction Save(Auction auction)
         {
-            if (this.dataStore.GetAuctions().Any(a => a.Id == auction.Id))
+            if (this.mainRepository.GetAuctions().Any(a => a.Id == auction.Id))
             {
-                return this.dataStore.Update(auction);
+                return this.mainRepository.Update(auction);
             }
 
-            return this.dataStore.Add(auction);
+            return this.mainRepository.Add(auction);
         }
 
         public Bid PlaceBid(Member bidder, Auction auction, double amount)
         {
-            var auct = this.dataStore.GetAuctions().FirstOrDefault(a => a.Id == auction.Id && a == auction);
+            var auct = this.mainRepository.GetAuctions().FirstOrDefault(a => a.Id == auction.Id && a == auction);
 
             if (auct == null)
             {
@@ -55,7 +55,7 @@ namespace DotNetBay.Core.Service
                 Bidder = bidder
             };
 
-            this.dataStore.Add(bid);
+            this.mainRepository.Add(bid);
 
             return bid;
         }

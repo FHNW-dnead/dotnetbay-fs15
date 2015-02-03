@@ -8,13 +8,13 @@ namespace DotNetBay.Core.Service
 {
     public class AuctionRunner : IAuctionRunner
     {
-        private readonly IDataStore dataStore;
+        private readonly IMainRepository mainRepository;
 
         private readonly Timer timer;
 
-        public AuctionRunner(IDataStore dataStore)
+        public AuctionRunner(IMainRepository mainRepository)
         {
-            this.dataStore = dataStore;
+            this.mainRepository = mainRepository;
             this.timer = new Timer(this.Callback, null, Timeout.Infinite, Timeout.Infinite);
         }
 
@@ -31,7 +31,7 @@ namespace DotNetBay.Core.Service
         private void Callback(object state)
         {
             // Process all auctions with open bids
-            var openAuctions = this.dataStore.GetAuctions().Where(a => a.Bids.Any(b => b.Accepted == null));
+            var openAuctions = this.mainRepository.GetAuctions().Where(a => a.Bids.Any(b => b.Accepted == null));
 
             foreach (var VARIABLE in openAuctions)
             {

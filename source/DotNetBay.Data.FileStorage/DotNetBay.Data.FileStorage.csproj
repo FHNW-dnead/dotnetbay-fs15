@@ -43,8 +43,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataRootElement.cs" />
-    <Compile Include="FileDataStore.cs" />
-    <Compile Include="FileDataStoreFactory.cs" />
+    <Compile Include="FileSystemMainRepository.cs" />
+    <Compile Include="FileSystemRepositoryFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
