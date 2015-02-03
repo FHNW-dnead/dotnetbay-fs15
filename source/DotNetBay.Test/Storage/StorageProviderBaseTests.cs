@@ -35,7 +35,7 @@ namespace DotNetBay.Test.Storage
         }
 
         [TestCase]
-        public void GivenEmptyStore_AddAuctionWithSeller_AuctionAndMemberAreStoredIndividually()
+        public void GivenAnEmptyStore_AddAuctionWithSeller_AuctionAndMemberAreStoredIndividually()
         {
             var myAuction = CreateAnAuction();
             var myMember = CreateAMember();
@@ -69,7 +69,7 @@ namespace DotNetBay.Test.Storage
         }
 
         [TestCase]
-        public void GivenEmptyStore_AddAMemberWithAuctions_MemberAndAuctionsAreStoredIndividually()
+        public void GivenAnEmptyStore_AddAMemberWithAuctions_MemberAndAuctionsAreStoredIndividually()
         {
             var myAuction = CreateAnAuction();
             var myMember = CreateAMember();
