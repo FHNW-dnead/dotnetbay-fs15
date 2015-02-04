@@ -59,10 +59,7 @@ namespace DotNetBay.Data.FileStorage
                     this.data.Members.Add(seller);
                 }
 
-                // Check References
-                this.ThrowIfReferenceNotFound(auction, x => x.Bids, this.data.Bids, r => r.Id);
-                this.ThrowIfReferenceNotFound(auction, x => x.Seller, this.data.Members, r => r.UniqueId);
-                this.ThrowIfReferenceNotFound(auction, x => x.Winner, this.data.Members, r => r.UniqueId);
+                this.ThrowForInvalidReferences(auction);
 
                 if (this.data.Auctions.Any(a => a.Id == auction.Id))
                 {
@@ -97,10 +94,9 @@ namespace DotNetBay.Data.FileStorage
                     throw new ArgumentException("A member with the same uniqueId already exists!");
                 }
 
-                this.data.Members.Add(member);
+                this.ThrowForInvalidReferences(member);
 
-                this.ThrowIfReferenceNotFound(member, x => x.Auctions, this.data.Auctions, r => r.Id);
-                this.ThrowIfReferenceNotFound(member, x => x.Bids, this.data.Bids, r => r.Id);
+                this.data.Members.Add(member);
 
                 if (member.Auctions != null && member.Auctions.Any())
                 {
@@ -132,10 +128,7 @@ namespace DotNetBay.Data.FileStorage
                     throw new ApplicationException("This auction does not exist and cannot be updated!");
                 }
 
-                // Check References
-                this.ThrowIfReferenceNotFound(auction, x => x.Bids, this.data.Bids, r => r.Id);
-                this.ThrowIfReferenceNotFound(auction, x => x.Seller, this.data.Members, r => r.UniqueId);
-                this.ThrowIfReferenceNotFound(auction, x => x.Winner, this.data.Members, r => r.UniqueId);
+                this.ThrowForInvalidReferences(auction);
 
                 foreach (var bid in auction.Bids)
                 {
@@ -169,10 +162,6 @@ namespace DotNetBay.Data.FileStorage
             {
                 this.EnsureCompleteLoaded();
 
-                // Check References
-                this.ThrowIfReferenceNotFound(bid, x => x.Auction, this.data.Auctions, r => r.Id);
-                this.ThrowIfReferenceNotFound(bid, x => x.Bidder, this.data.Members, r => r.UniqueId);
-
                 // Does the auction exist?
                 if (this.data.Auctions.All(a => a.Id != bid.Auction.Id))
                 {
@@ -185,7 +174,7 @@ namespace DotNetBay.Data.FileStorage
                     throw new ApplicationException("the bidder does not exist and cannot be added this way!");
                 }
 
-                //// TODO: Fail if the references are not the same
+                this.ThrowForInvalidReferences(bid);
 
                 var maxId = this.data.Bids.Any() ? this.data.Bids.Max(a => a.Id) : 0;
                 bid.Id = maxId + 1;
@@ -243,6 +232,7 @@ namespace DotNetBay.Data.FileStorage
 
         protected void BeforeLoad()
         {
+            // Factory method to override
         }
 
         protected void AfterSave()
@@ -264,37 +254,44 @@ namespace DotNetBay.Data.FileStorage
             }
         }
 
-        private void SaveBinary(string fileName, byte[] fileContent)
-        {
-            var fullFileName = Path.Combine(this.rootDirectory, fileName);
+        #region Reference Checks
 
-            if (fileContent == null)
+        private void ThrowForInvalidReferences()
+        {
+            foreach (var auction in this.data.Auctions)
             {
-                try
-                {
-                    File.Delete(fullFileName);
-                }
-                catch
-                {
-                    // ignored
-                }
+                this.ThrowForInvalidReferences(auction);
             }
-            else
+
+            foreach (var member in this.data.Members)
             {
-                File.WriteAllBytes(fullFileName, fileContent);
+                this.ThrowForInvalidReferences(member);
+            }
+
+            foreach (var bid in this.data.Bids)
+            {
+                this.ThrowForInvalidReferences(bid);
             }
         }
 
-        private byte[] LoadBinary(string fileName)
+        private void ThrowForInvalidReferences(Auction auction)
         {
-            var fullFileName = Path.Combine(this.rootDirectory, fileName);
+            // Check References
+            this.ThrowIfReferenceNotFound(auction, x => x.Bids, this.data.Bids, r => r.Id);
+            this.ThrowIfReferenceNotFound(auction, x => x.Seller, this.data.Members, r => r.UniqueId);
+            this.ThrowIfReferenceNotFound(auction, x => x.Winner, this.data.Members, r => r.UniqueId);
+        }
 
-            if (File.Exists(fullFileName))
-            {
-                return File.ReadAllBytes(fullFileName);
-            }
+        private void ThrowForInvalidReferences(Bid bid)
+        {
+            this.ThrowIfReferenceNotFound(bid, x => x.Auction, this.data.Auctions, r => r.Id);
+            this.ThrowIfReferenceNotFound(bid, x => x.Bidder, this.data.Members, r => r.UniqueId);
+        }
 
-            return null;
+        private void ThrowForInvalidReferences(Member member)
+        {
+            this.ThrowIfReferenceNotFound(member, x => x.Auctions, this.data.Auctions, r => r.Id);
+            this.ThrowIfReferenceNotFound(member, x => x.Bids, this.data.Bids, r => r.Id);
         }
 
         private void ThrowIfReferenceNotFound<TRootElementType, TNavigationElementType>(
@@ -337,6 +334,57 @@ namespace DotNetBay.Data.FileStorage
             if (referencedElement != resolvedElementById)
             {
                 throw new Exception("Unable to process objects across contexts!");
+            }
+        }
+
+        #endregion
+
+        #region Binary-Fields (Save/Loading)
+
+        private void SaveBinary(string fileName, byte[] fileContent)
+        {
+            var fullFileName = Path.Combine(this.rootDirectory, fileName);
+
+            if (fileContent == null)
+            {
+                try
+                {
+                    File.Delete(fullFileName);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+            else
+            {
+                File.WriteAllBytes(fullFileName, fileContent);
+            }
+        }
+
+        private byte[] LoadBinary(string fileName)
+        {
+            var fullFileName = Path.Combine(this.rootDirectory, fileName);
+
+            if (File.Exists(fullFileName))
+            {
+                return File.ReadAllBytes(fullFileName);
+            }
+
+            return null;
+        }
+
+
+        #endregion
+
+        #region Persistence
+
+        private void EnsureCompleteLoaded()
+        {
+            if (!this.isLoaded || this.data == null || this.data.Auctions == null || this.data.Bids == null
+                || this.data.Members == null)
+            {
+                this.Load();
             }
         }
 
@@ -384,13 +432,7 @@ namespace DotNetBay.Data.FileStorage
             }
         }
 
-        private void EnsureCompleteLoaded()
-        {
-            if (!this.isLoaded || this.data == null || this.data.Auctions == null || this.data.Bids == null ||
-                this.data.Members == null)
-            {
-                this.Load();
-            }
-        }
+
+        #endregion
     }
 }
