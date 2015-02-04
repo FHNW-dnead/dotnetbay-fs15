@@ -25,6 +25,7 @@ namespace DotNetBay.Test.Storage
             {
                 var initRepo = factory.CreateMainRepository();
                 initRepo.Add(myAuction);
+                initRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
 
@@ -49,6 +50,7 @@ namespace DotNetBay.Test.Storage
             {
                 var initRepo = factory.CreateMainRepository();
                 initRepo.Add(myAuction);
+                initRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
 
@@ -85,6 +87,7 @@ namespace DotNetBay.Test.Storage
             {
                 var initRepo = factory.CreateMainRepository();
                 initRepo.Add(myMember);
+                initRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
 
@@ -112,14 +115,16 @@ namespace DotNetBay.Test.Storage
 
             using (var factory = this.CreateFactory())
             {
-                var firstRepo = factory.CreateMainRepository();
-                firstRepo.Add(myMember);
+                var initRepo = factory.CreateMainRepository();
+                initRepo.Add(myMember);
+                initRepo.SaveChanges();
 
                 var secondRepo = factory.CreateMainRepository();
 
                 // References
                 myAuction.Seller = secondRepo.GetMembers().FirstOrDefault();
                 secondRepo.Add(myAuction);
+                secondRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
                 allAuctionsFromRepo = testRepo.GetAuctions();
@@ -175,7 +180,7 @@ namespace DotNetBay.Test.Storage
         }
 
         [TestCase]
-        public void GivenARepoWithAuctionAndMember_AddBid_RetrievedByTransactionId()
+        public void GivenARepoWithAuctionAndMember_AddBid_CanBeRetrievedByTransactionId()
         {
             var theSeller = CreateAMember();
             var myAuction = CreateAnAuction();
@@ -258,8 +263,9 @@ namespace DotNetBay.Test.Storage
 
             using (var factory = this.CreateFactory())
             {
-                var firstRepo = factory.CreateMainRepository();
-                firstRepo.Add(myAuction);
+                var initRepo = factory.CreateMainRepository();
+                initRepo.Add(myAuction);
+                initRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
                 testRepo.Add(myAuction);
@@ -282,8 +288,9 @@ namespace DotNetBay.Test.Storage
 
             using (var factory = this.CreateFactory())
             {
-                var firstRepo = factory.CreateMainRepository();
-                firstRepo.Add(myMember);
+                var initRepo = factory.CreateMainRepository();
+                initRepo.Add(myMember);
+                initRepo.SaveChanges();
 
                 var testSore = factory.CreateMainRepository();
                 testSore.Add(otherMember);
@@ -305,8 +312,9 @@ namespace DotNetBay.Test.Storage
 
             using (var factory = this.CreateFactory())
             {
-                var firstRepo = factory.CreateMainRepository();
-                firstRepo.Add(myAuction);
+                var initRepo = factory.CreateMainRepository();
+                initRepo.Add(myAuction);
+                initRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
                 allAuctionFromRepo = testRepo.GetAuctions();
@@ -334,8 +342,9 @@ namespace DotNetBay.Test.Storage
 
             using (var factory = this.CreateFactory())
             {
-                var firstRepo = factory.CreateMainRepository();
-                firstRepo.Add(myAuction);
+                var initRepo = factory.CreateMainRepository();
+                initRepo.Add(myAuction);
+                initRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
                 imageFromRepo = testRepo.GetAuctions().First().Image;
@@ -358,13 +367,15 @@ namespace DotNetBay.Test.Storage
 
             using (var factory = this.CreateFactory())
             {
-                var firstRepo = factory.CreateMainRepository();
-                firstRepo.Add(myAuction);
+                var initRepo = factory.CreateMainRepository();
+                initRepo.Add(myAuction);
+                initRepo.SaveChanges();
 
                 var secondRepo = factory.CreateMainRepository();
                 var auctionFromRepo = secondRepo.GetAuctions().First();
                 auctionFromRepo.Image = null;
                 secondRepo.Update(auctionFromRepo);
+                secondRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
                 imageFromRepo = testRepo.GetAuctions().First().Image;

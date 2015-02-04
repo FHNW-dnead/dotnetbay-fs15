@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+
 using DotNetBay.Model;
 
 namespace DotNetBay.Interfaces
@@ -19,5 +20,7 @@ namespace DotNetBay.Interfaces
         Bid GetBidByTransactionId(Guid transactionId);
 
         Member Add(Member member);
+
+        void SaveChanges();
     }
 }

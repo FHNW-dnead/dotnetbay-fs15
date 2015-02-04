@@ -77,8 +77,6 @@ namespace DotNetBay.Data.FileStorage
                     seller.Auctions.Add(auction);
                 }
 
-                this.Save();
-
                 return auction;
             }
         }
@@ -105,8 +103,6 @@ namespace DotNetBay.Data.FileStorage
                         this.Add(auction);
                     }
                 }
-
-                this.Save();
 
                 return member;
             }
@@ -139,8 +135,6 @@ namespace DotNetBay.Data.FileStorage
                         this.data.Bids.Add(bid);
                     }
                 }
-
-                this.Save();
 
                 return auction;
             }
@@ -221,6 +215,15 @@ namespace DotNetBay.Data.FileStorage
             }
         }
 
+        public void SaveChanges()
+        {
+            this.ThrowForInvalidReferences();
+
+            this.Save();
+        }
+
+        #region Before / After Save Hooks
+
         protected virtual void AfterLoad()
         {
             // Reload Images from FS
@@ -253,6 +256,9 @@ namespace DotNetBay.Data.FileStorage
                 auction.Image = null;
             }
         }
+
+
+        #endregion
 
         #region Reference Checks
 
