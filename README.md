@@ -1,4 +1,6 @@
-# dotnetbay - A .NET Auction Solution [![Build status](https://ci.appveyor.com/api/projects/status/qp7ueees06ri8agu?svg=true)](https://ci.appveyor.com/project/michaelschnyder/fhnw-dotnetbay)
+# dotnetbay - A .NET Auction Solution 
+Master: [![Build status](https://ci.appveyor.com/api/projects/status/qp7ueees06ri8agu?svg=true)](https://ci.appveyor.com/project/michaelschnyder/fhnw-dotnetbay)
+
 A bootstrap solution to build your own basic auction portal
 
 ## Goals
@@ -24,6 +26,7 @@ The following products / tools are needed to contribute / fork.
 **For Pleasure**
 * SourceTree [http://www.sourcetreeapp.com/](http://www.sourcetreeapp.com/ "http://www.sourcetreeapp.com/")
 * MarkdownPad [http://markdownpad.com/](http://markdownpad.com/ "http://markdownpad.com/")
+* NCrunch [http://www.ncrunch.net/](http://www.ncrunch.net/ http://www.ncrunch.net/)
 
 ## Authors
 * Michael Schnyder
