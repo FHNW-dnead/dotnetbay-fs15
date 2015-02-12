@@ -215,7 +215,7 @@ namespace DotNetBay.Data.FileStorage
             }
         }
 
-        public void SaveChanges()
+        public virtual void SaveChanges()
         {
             this.ThrowForInvalidReferences();
 
@@ -262,7 +262,7 @@ namespace DotNetBay.Data.FileStorage
 
         #region Reference Checks
 
-        private void ThrowForInvalidReferences()
+        protected void ThrowForInvalidReferences()
         {
             foreach (var auction in this.data.Auctions)
             {
@@ -394,7 +394,7 @@ namespace DotNetBay.Data.FileStorage
             }
         }
 
-        private void Load()
+        protected virtual void Load()
         {
             lock (this.syncRoot)
             {
@@ -421,7 +421,7 @@ namespace DotNetBay.Data.FileStorage
             }
         }
 
-        private void Save()
+        protected virtual void Save()
         {
             lock (this.syncRoot)
             {
