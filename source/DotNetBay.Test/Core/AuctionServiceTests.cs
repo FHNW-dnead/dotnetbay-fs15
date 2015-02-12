@@ -6,15 +6,14 @@ using DotNetBay.Core;
 using DotNetBay.Data.FileStorage;
 using DotNetBay.Model;
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace DotNetBay.Test.Core
 {
-    [TestClass]
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "This is a testclass")]
     public class AuctionServiceTests
     {
-        [TestMethod]
+        [TestCase]
         public void GivenAProperService_GetsAValidAuction_ShouldReturnSameFromAuctionList()
         {
             var service = new AuctionService(new InMemoryMainRepository());
@@ -26,7 +25,7 @@ namespace DotNetBay.Test.Core
             Assert.AreEqual(auctionFromService, auction);
         }
 
-        [TestMethod]
+        [TestCase]
         public void WithExistingAuction_AfterPlacingABid_TheBidShouldBeAssignedToAuctionAndUser()
         {
             var auction = CreateGeneratedAuction();
