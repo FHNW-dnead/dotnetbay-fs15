@@ -1,26 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-using DotNetBay.Interfaces;
-using DotNetBay.Model;
+﻿using System.IO;
 
 using Newtonsoft.Json;
 
 namespace DotNetBay.Data.FileStorage
 {
-    public class FileSystemMainRepository : IMainRepository
+    public class FileSystemMainRepository : InMemoryMainRepository
     {
         // Poor-Mans locking mechanism
-        private readonly object syncRoot = new object();
         private readonly string fullPath;
         private readonly JsonSerializerSettings jsonSerializerSettings;
         private readonly string rootDirectory;
 
-        private bool isLoaded;
-
-        private DataRootElement data;
         private string dataPath;
 
         public FileSystemMainRepository(string fileName)
@@ -36,310 +26,66 @@ namespace DotNetBay.Data.FileStorage
             };
         }
 
-        public Auction Add(Auction auction)
+        #region Persistence
+
+        internal override DataRootElement LoadData()
         {
-            if (auction.Seller == null)
+            if (!File.Exists(this.fullPath))
             {
-                throw new ArgumentException("Its required to set a seller");
+                var file = File.Create(this.fullPath);
+                file.Close();
             }
 
-            lock (this.syncRoot)
-            {
-                this.EnsureCompleteLoaded();
+            var content = File.ReadAllText(this.fullPath);
 
-                // Add Member (from Seller) if not yet exists
-                var seller = this.data.Members.FirstOrDefault(m => m.UniqueId == auction.Seller.UniqueId);
-
-                // Create member as seller if not exists
-                if (seller == null)
-                {
-                    // The seller does not yet exist in store
-                    seller = auction.Seller;
-                    seller.Auctions = new List<Auction>(new[] { auction });
-                    this.data.Members.Add(seller);
-                }
-
-                this.ThrowForInvalidReferences(auction);
-
-                if (this.data.Auctions.Any(a => a.Id == auction.Id))
-                {
-                    throw new ArgumentException("The auction is already stored");
-                }
-
-                var maxId = this.data.Auctions.Any() ? this.data.Auctions.Max(a => a.Id) : 0;
-                auction.Id = maxId + 1;
-
-                this.data.Auctions.Add(auction);
-
-                // Add auction to sellers list of auctions
-                if (seller.Auctions.All(a => a.Id != auction.Id))
-                {
-                    seller.Auctions.Add(auction);
-                }
-
-                return auction;
-            }
+            var restored = JsonConvert.DeserializeObject<DataRootElement>(content, this.jsonSerializerSettings);
+            return restored;
         }
 
-        public Member Add(Member member)
+        internal override void SaveData(DataRootElement data)
         {
-            lock (this.syncRoot)
-            {
-                this.EnsureCompleteLoaded();
-
-                if (this.data.Members.Any(m => m.UniqueId == member.UniqueId))
-                {
-                    throw new ArgumentException("A member with the same uniqueId already exists!");
-                }
-
-                this.ThrowForInvalidReferences(member);
-
-                this.data.Members.Add(member);
-
-                if (member.Auctions != null && member.Auctions.Any())
-                {
-                    foreach (var auction in member.Auctions)
-                    {
-                        this.Add(auction);
-                    }
-                }
-
-                return member;
-            }
+            var content = JsonConvert.SerializeObject(data, this.jsonSerializerSettings);
+            File.WriteAllText(this.fullPath, content);
         }
-
-        public Auction Update(Auction auction)
-        {
-            if (auction.Seller == null)
-            {
-                throw new ArgumentException("Its required to set a seller");
-            }
-
-            lock (this.syncRoot)
-            {
-                this.EnsureCompleteLoaded();
-
-                if (this.data.Auctions.All(a => a.Id != auction.Id))
-                {
-                    throw new ApplicationException("This auction does not exist and cannot be updated!");
-                }
-
-                this.ThrowForInvalidReferences(auction);
-
-                foreach (var bid in auction.Bids)
-                {
-                    bid.Auction = auction;
-
-                    if (!this.data.Bids.Contains(bid))
-                    {
-                        this.data.Bids.Add(bid);
-                    }
-                }
-
-                return auction;
-            }
-        }
-
-        public Bid Add(Bid bid)
-        {
-            if (bid.Bidder == null)
-            {
-                throw new ArgumentException("Its required to set a bidder");
-            }
-
-            if (bid.Auction == null)
-            {
-                throw new ArgumentException("Its required to set an auction");
-            }
-
-            lock (this.syncRoot)
-            {
-                this.EnsureCompleteLoaded();
-
-                // Does the auction exist?
-                if (this.data.Auctions.All(a => a.Id != bid.Auction.Id))
-                {
-                    throw new ApplicationException("This auction does not exist an cannot be added this way!");
-                }
-
-                // Does the member exist?
-                if (this.data.Members.All(a => a.UniqueId != bid.Bidder.UniqueId))
-                {
-                    throw new ApplicationException("the bidder does not exist and cannot be added this way!");
-                }
-
-                this.ThrowForInvalidReferences(bid);
-
-                var maxId = this.data.Bids.Any() ? this.data.Bids.Max(a => a.Id) : 0;
-                bid.Id = maxId + 1;
-                bid.Accepted = null;
-                bid.TransactionId = Guid.NewGuid();
-                
-                this.data.Bids.Add(bid);
-
-                // Reference back from auction
-                var auction = this.data.Auctions.FirstOrDefault(a => a.Id == bid.Auction.Id);
-                auction.Bids.Add(bid);
-
-                return null;
-            }
-        }
-
-        public Bid GetBidByTransactionId(Guid transactionId)
-        {
-            lock (this.syncRoot)
-            {
-                this.EnsureCompleteLoaded();
-
-                return this.data.Bids.FirstOrDefault(b => b.TransactionId == transactionId);
-            }
-        }
-
-        public IQueryable<Auction> GetAuctions()
-        {
-            lock (this.syncRoot)
-            {
-                this.EnsureCompleteLoaded();
-
-                return this.data.Auctions.AsQueryable();
-            }
-        }
-
-        public IQueryable<Member> GetMembers()
-        {
-            lock (this.syncRoot)
-            {
-                this.EnsureCompleteLoaded();
-
-                return this.data.Members.AsQueryable();
-            }
-        }
-
-        public virtual void SaveChanges()
-        {
-            this.ThrowForInvalidReferences();
-
-            this.Save();
-        }
-
-        #region Before / After Save Hooks
-
-        protected virtual void AfterLoad()
-        {
-            // Reload Images from FS
-            foreach (var auction in this.data.Auctions)
-            {
-                auction.Image = this.LoadBinary(string.Format("auction-{0}-image1.jpg", auction.Id));
-            }
-        }
-
-        protected void BeforeLoad()
-        {
-            // Factory method to override
-        }
-
-        protected void AfterSave()
-        {
-            // Reload Images from FS
-            foreach (var auction in this.data.Auctions)
-            {
-                auction.Image = this.LoadBinary(string.Format("auction-{0}-image1.jpg", auction.Id));
-            }
-        }
-
-        protected void BeforeSave()
-        {
-            // Remove byte values from images and save individually
-            foreach (var auction in this.data.Auctions)
-            {
-                this.SaveBinary(string.Format("auction-{0}-image1.jpg", auction.Id), auction.Image);
-                auction.Image = null;
-            }
-        }
-
 
         #endregion
 
-        #region Reference Checks
+        #region Before / After Save Hooks
 
-        protected void ThrowForInvalidReferences()
+        internal override void AfterLoad(DataRootElement data)
         {
-            foreach (var auction in this.data.Auctions)
+            // Reload Images from FS
+            foreach (var auction in data.Auctions)
             {
-                this.ThrowForInvalidReferences(auction);
-            }
-
-            foreach (var member in this.data.Members)
-            {
-                this.ThrowForInvalidReferences(member);
-            }
-
-            foreach (var bid in this.data.Bids)
-            {
-                this.ThrowForInvalidReferences(bid);
+                auction.Image = this.LoadBinary(string.Format("auction-{0}-image1.jpg", auction.Id));
             }
         }
 
-        private void ThrowForInvalidReferences(Auction auction)
+        internal override void BeforeLoad(DataRootElement data)
         {
-            // Check References
-            this.ThrowIfReferenceNotFound(auction, x => x.Bids, this.data.Bids, r => r.Id);
-            this.ThrowIfReferenceNotFound(auction, x => x.Seller, this.data.Members, r => r.UniqueId);
-            this.ThrowIfReferenceNotFound(auction, x => x.Winner, this.data.Members, r => r.UniqueId);
+            // Ensure existence of directory
+            Directory.CreateDirectory(this.rootDirectory);
         }
 
-        private void ThrowForInvalidReferences(Bid bid)
+        internal override void AfterSave(DataRootElement data)
         {
-            this.ThrowIfReferenceNotFound(bid, x => x.Auction, this.data.Auctions, r => r.Id);
-            this.ThrowIfReferenceNotFound(bid, x => x.Bidder, this.data.Members, r => r.UniqueId);
-        }
-
-        private void ThrowForInvalidReferences(Member member)
-        {
-            this.ThrowIfReferenceNotFound(member, x => x.Auctions, this.data.Auctions, r => r.Id);
-            this.ThrowIfReferenceNotFound(member, x => x.Bids, this.data.Bids, r => r.Id);
-        }
-
-        private void ThrowIfReferenceNotFound<TRootElementType, TNavigationElementType>(
-            TRootElementType obj,
-            Func<TRootElementType, List<TNavigationElementType>> navigationAccessor,
-            IEnumerable<TNavigationElementType> validInstances,
-            Func<TNavigationElementType, object> identificationAccessor)
-        {
-            var value = navigationAccessor(obj);
-
-            if (value == null)
+            // Reload Images from FS
+            foreach (var auction in data.Auctions)
             {
-                return;
-            }
-
-            var referencedElementsToTest = value.Where(x => validInstances.Any(r => identificationAccessor(r) == identificationAccessor(x)));
-            var resolvedElementsById = validInstances.Where(x => referencedElementsToTest.Any(r => identificationAccessor(r).Equals(identificationAccessor(x))));
-
-            if (referencedElementsToTest.Any(element => !resolvedElementsById.Contains(element)))
-            {
-                throw new Exception("Unable to process objects across contexts!");
+                auction.Image = this.LoadBinary(string.Format("auction-{0}-image1.jpg", auction.Id));
             }
         }
 
-        private void ThrowIfReferenceNotFound<TRootElementType, TNavigationElementType>(
-            TRootElementType obj,
-            Func<TRootElementType, TNavigationElementType> navigationAccessor,
-            IEnumerable<TNavigationElementType> validInstances,
-            Func<TNavigationElementType, object> identificationAccessor) where TNavigationElementType : class
+        internal override void BeforeSave(DataRootElement data)
         {
-            var referencedElement = navigationAccessor(obj);
+            // Ensure existence of directory
+            Directory.CreateDirectory(this.rootDirectory);
 
-            if (referencedElement == null)
+            // Remove byte values from images and save individually
+            foreach (var auction in data.Auctions)
             {
-                return;
-            }
-
-            var resolvedElementById = validInstances.FirstOrDefault(x => identificationAccessor(x).Equals(identificationAccessor(referencedElement)));
-
-            if (referencedElement != resolvedElementById)
-            {
-                throw new Exception("Unable to process objects across contexts!");
+                this.SaveBinary(string.Format("auction-{0}-image1.jpg", auction.Id), auction.Image);
+                auction.Image = null;
             }
         }
 
@@ -378,64 +124,6 @@ namespace DotNetBay.Data.FileStorage
             }
 
             return null;
-        }
-
-
-        #endregion
-
-        #region Persistence
-
-        private void EnsureCompleteLoaded()
-        {
-            if (!this.isLoaded || this.data == null || this.data.Auctions == null || this.data.Bids == null
-                || this.data.Members == null)
-            {
-                this.Load();
-            }
-        }
-
-        protected virtual void Load()
-        {
-            lock (this.syncRoot)
-            {
-                // Ensure existence of directory
-                Directory.CreateDirectory(this.rootDirectory);
-
-                this.BeforeLoad();
-
-                if (!File.Exists(this.fullPath))
-                {
-                    var file = File.Create(this.fullPath);
-                    file.Close();
-                }
-
-                var content = File.ReadAllText(this.fullPath);
-
-                var restored = JsonConvert.DeserializeObject<DataRootElement>(content, this.jsonSerializerSettings);
-
-                this.data = restored ?? new DataRootElement();
-
-                this.isLoaded = true;
-
-                this.AfterLoad();
-            }
-        }
-
-        protected virtual void Save()
-        {
-            lock (this.syncRoot)
-            {
-                // Ensure existence of directory
-                Directory.CreateDirectory(this.rootDirectory);
-
-                this.BeforeSave();
-
-                var content = JsonConvert.SerializeObject(this.data, this.jsonSerializerSettings);
-
-                File.WriteAllText(this.fullPath, content);
-
-                this.AfterSave();
-            }
         }
 
 

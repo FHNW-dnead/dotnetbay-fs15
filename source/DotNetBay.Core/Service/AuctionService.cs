@@ -31,6 +31,7 @@ namespace DotNetBay.Core.Service
                 return this.mainRepository.Update(auction);
             }
 
+            this.ValidateNewAuctionAndThrow(auction);
             return this.mainRepository.Add(auction);
         }
 
@@ -60,7 +61,7 @@ namespace DotNetBay.Core.Service
             return bid;
         }
 
-        public void AddAuction(Auction auction)
+        private void ValidateNewAuctionAndThrow(Auction auction)
         {
             if (auction == null)
             {
@@ -101,9 +102,6 @@ namespace DotNetBay.Core.Service
             {
                 throw new ArgumentException("Every auction needs a title", "auction");
             }
-
-            this.mainRepository.Add(auction);
-            this.mainRepository.SaveChanges();
         }
     }
 }

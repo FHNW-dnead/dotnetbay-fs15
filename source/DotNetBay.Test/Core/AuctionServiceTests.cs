@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using DotNetBay.Core.Service;
+using DotNetBay.Data.FileStorage;
 using DotNetBay.Model;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,7 +20,7 @@ namespace DotNetBay.Test.Core
             var service = new AuctionService(new InMemoryMainRepository());
 
             var auction = CreateGeneratedAuction();
-            service.AddAuction(auction);
+            service.Save(auction);
 
             var auctionFromService = service.GetAuctions().First();
             Assert.AreEqual(auctionFromService, auction);
