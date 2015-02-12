@@ -32,6 +32,11 @@ namespace DotNetBay.Model
         /// </summary>
         public DateTime EndDateTimeUtc { get; set; }
 
+        /// <summary>
+        /// Gets or sets the UTC DateTime values to avoid wrong data when serializing the values
+        /// </summary>
+        public DateTime CloseDateTimeUtc { get; set; }
+
         public Member Seller { get; set; }
 
         public Member Winner { get; set; }

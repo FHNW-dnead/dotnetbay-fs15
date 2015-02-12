@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Threading;
 
+using DotNetBay.Core.Execution;
 using DotNetBay.Interfaces;
 
 namespace DotNetBay.Core
 {
-    public class AuctionRunner : IAuctionRunner
+    public class AuctionRunner : IAuctionRunner, IDisposable
     {
         private readonly IMainRepository mainRepository;
 
@@ -29,6 +30,14 @@ namespace DotNetBay.Core
             this.auctioneer = new Auctioneer(mainRepository);
         }
 
+        public IAuctioneer Auctioneer
+        {
+            get
+            {
+                return this.auctioneer;
+            }
+        }
+
         public void Start()
         {
             this.timer.Change(this.checkInterval, this.checkInterval);
@@ -39,11 +48,14 @@ namespace DotNetBay.Core
             this.timer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
+        public void Dispose()
+        {
+            this.timer.Dispose();
+        }
+
         private void Callback(object state)
         {
-            this.auctioneer.ProcessOpenBids();
-
-            this.auctioneer.CloseFinishedAuctions();
+            this.auctioneer.DoAllWork();
         }
     }
 }

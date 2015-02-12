@@ -5,7 +5,7 @@ using DotNetBay.Interfaces;
 
 namespace DotNetBay.Core.Execution
 {
-    public class Auctioneer
+    public class Auctioneer : IAuctioneer
     {
         private readonly IMainRepository repository;
 
@@ -14,7 +14,57 @@ namespace DotNetBay.Core.Execution
             this.repository = repository;
         }
 
-        public void ProcessOpenBids()
+        #region Events
+
+        public event EventHandler<ProcessedBidEventArgs> BidDeclined;
+
+        public event EventHandler<ProcessedBidEventArgs> BidAccepted;
+
+        public event EventHandler<AuctionEventArgs> AuctionClosed;
+
+        #endregion
+
+        public void DoAllWork()
+        {
+            this.ProcessOpenBids();
+
+            this.CloseFinishedAuctions();
+        }
+
+        #region Event Invocation
+
+        protected virtual void OnBidDeclined(ProcessedBidEventArgs e)
+        {
+            var handler = this.BidDeclined;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        protected virtual void OnBidAccepted(ProcessedBidEventArgs e)
+        {
+            var handler = this.BidAccepted;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        protected virtual void OnAuctionClosed(AuctionEventArgs e)
+        {
+            var handler = this.AuctionClosed;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
+        #endregion
+
+        #region The Magic itself
+
+        private void ProcessOpenBids()
         {
             // Process all auctions with open bids
             var openAuctions = this.repository.GetAuctions().Where(a => a.Bids.Any(b => b.Accepted == null));
@@ -30,21 +80,24 @@ namespace DotNetBay.Core.Execution
                         bid.Accepted = true;
                         auction.CurrentPrice = bid.Amount;
                         auction.LastBid = bid;
+                        this.OnBidAccepted(new ProcessedBidEventArgs { Bid = bid, Auction = auction });
                     }
                     else
                     {
                         bid.Accepted = false;
-                    } 
+                        this.OnBidDeclined(new ProcessedBidEventArgs { Bid = bid, Auction = auction });
+                    }
                 }
             }
 
             this.repository.SaveChanges();
         }
 
-        public void CloseFinishedAuctions()
+        private void CloseFinishedAuctions()
         {
-            // Process all auctions with open bids
-            var auctionsToClose = this.repository.GetAuctions().Where(a => !a.IsClosed && a.EndDateTimeUtc <= DateTime.UtcNow).ToList();
+            // Process all auctions which should be closed
+            var auctionsToClose =
+                this.repository.GetAuctions().Where(a => !a.IsClosed && a.EndDateTimeUtc <= DateTime.UtcNow).ToList();
 
             foreach (var auction in auctionsToClose)
             {
@@ -60,9 +113,15 @@ namespace DotNetBay.Core.Execution
                 }
 
                 auction.IsClosed = true;
+                auction.CloseDateTimeUtc = DateTime.UtcNow;
+
+                this.repository.SaveChanges();
+
+                this.OnAuctionClosed(
+                    new AuctionEventArgs() { Auction = auction, IsSucessfull = auction.Winner != null });
             }
-            
-            this.repository.SaveChanges();
         }
+
+        #endregion
     }
 }

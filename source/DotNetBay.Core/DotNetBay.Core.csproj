@@ -39,8 +39,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Execution\AuctionEventArgs.cs" />
+    <Compile Include="Execution\IAuctioneer.cs" />
+    <Compile Include="Execution\ProcessedBidEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Auctioneer.cs" />
+    <Compile Include="Execution\Auctioneer.cs" />
     <Compile Include="AuctionRunner.cs" />
     <Compile Include="AuctionService.cs" />
     <Compile Include="IAuctionService.cs" />
