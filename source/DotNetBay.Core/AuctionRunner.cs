@@ -8,7 +8,7 @@ namespace DotNetBay.Core
 {
     public class AuctionRunner : IAuctionRunner, IDisposable
     {
-        private readonly IMainRepository mainRepository;
+        private readonly IMainRepository repository;
 
         private readonly TimeSpan checkInterval;
 
@@ -16,18 +16,18 @@ namespace DotNetBay.Core
 
         private readonly Auctioneer auctioneer;
 
-        public AuctionRunner(IMainRepository mainRepository)
-            : this(mainRepository, TimeSpan.FromSeconds(5))
+        public AuctionRunner(IMainRepository repository)
+            : this(repository, TimeSpan.FromSeconds(5))
         {
         }
 
-        public AuctionRunner(IMainRepository mainRepository, TimeSpan checkInterval)
+        public AuctionRunner(IMainRepository repository, TimeSpan checkInterval)
         {
-            this.mainRepository = mainRepository;
+            this.repository = repository;
             this.checkInterval = checkInterval;
             this.timer = new Timer(this.Callback, null, Timeout.Infinite, Timeout.Infinite);
 
-            this.auctioneer = new Auctioneer(mainRepository);
+            this.auctioneer = new Auctioneer(repository);
         }
 
         public IAuctioneer Auctioneer
