@@ -14,7 +14,7 @@ namespace DotNetBay.Test.Core
     public class AuctionServiceTests
     {
         [TestCase]
-        public void GivenAProperService_GetsAValidAuction_ShouldReturnSameFromAuctionList()
+        public void GivenAProperService_SavesAValidAuction_ShouldReturnSameFromAuctionList()
         {
             var service = new AuctionService(new InMemoryMainRepository());
 

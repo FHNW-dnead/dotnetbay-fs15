@@ -77,14 +77,14 @@ namespace DotNetBay.Core.Execution
                 {
                     if (bid.Amount > auction.CurrentPrice)
                     {
-                        if (auction.LastBid != null && bid.ReceivedOnUtc < auction.LastBid.ReceivedOnUtc)
+                        if (auction.ActiveBid != null && bid.ReceivedOnUtc < auction.ActiveBid.ReceivedOnUtc)
                         {
                             throw new ApplicationException("Cannot handle higher bids which where look like coming from history!");
                         }
 
                         bid.Accepted = true;
+                        auction.ActiveBid = bid;
                         auction.CurrentPrice = bid.Amount;
-                        auction.LastBid = bid;
                         this.OnBidAccepted(new ProcessedBidEventArgs { Bid = bid, Auction = auction });
                     }
                     else
@@ -114,7 +114,7 @@ namespace DotNetBay.Core.Execution
 
                 if (auction.Bids.Any())
                 {
-                    auction.Winner = auction.LastBid.Bidder;
+                    auction.Winner = auction.ActiveBid.Bidder;
                 }
 
                 auction.IsClosed = true;

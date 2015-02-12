@@ -43,7 +43,7 @@ namespace DotNetBay.Model
 
         public List<Bid> Bids { get; set; }
 
-        public Bid LastBid { get; set; }
+        public Bid ActiveBid { get; set; }
 
         public bool IsClosed { get; set; }
     }
