@@ -77,6 +77,11 @@ namespace DotNetBay.Core.Execution
                 {
                     if (bid.Amount > auction.CurrentPrice)
                     {
+                        if (auction.LastBid != null && bid.ReceivedOnUtc < auction.LastBid.ReceivedOnUtc)
+                        {
+                            throw new ApplicationException("Cannot handle higher bids which where look like coming from history!");
+                        }
+
                         bid.Accepted = true;
                         auction.CurrentPrice = bid.Amount;
                         auction.LastBid = bid;

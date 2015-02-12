@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using DotNetBay.Core.Execution;
@@ -9,6 +10,7 @@ using NUnit.Framework;
 
 namespace DotNetBay.Test.Core
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "This is a Testclass")]
     public class AuctioneerTests
     {
         [TestCase]
@@ -75,7 +77,8 @@ namespace DotNetBay.Test.Core
         }
 
         [TestCase]
-        public void Auction_GetsOlderButHigherBid_HasNoImpact()
+        [ExpectedException(typeof(ApplicationException))]
+        public void Auction_GetsOlderButHigherBid_FailsWithException()
         {
             var repo = new InMemoryMainRepository();
             var auctioneer = new Auctioneer(repo);
@@ -90,9 +93,6 @@ namespace DotNetBay.Test.Core
             repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow.AddMinutes(-10), Bidder = bidder2, Amount = 70, Auction = auction });
 
             auctioneer.DoAllWork();
-
-            Assert.AreEqual(2, auction.Bids.Count);
-            Assert.AreEqual(60, auction.CurrentPrice);
         }
 
         [TestCase]
