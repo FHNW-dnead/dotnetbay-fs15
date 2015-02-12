@@ -11,14 +11,11 @@ namespace DotNetBay.Data.FileStorage
         private readonly JsonSerializerSettings jsonSerializerSettings;
         private readonly string rootDirectory;
 
-        private string dataPath;
-
         public FileSystemMainRepository(string fileName)
         {
             // It's good practice to expect either absolute or relative paths and handle both the same
             this.fullPath = Path.GetFullPath(fileName);
             this.rootDirectory = Path.GetDirectoryName(this.fullPath);
-            this.dataPath = Path.Combine(this.rootDirectory, "fileContent");
 
             this.jsonSerializerSettings = new JsonSerializerSettings
             {
