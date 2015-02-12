@@ -1,6 +1,4 @@
-﻿using DotNetBay.Core.Execution;
-
-namespace DotNetBay.Core
+﻿namespace DotNetBay.Core.Execution
 {
     public interface IAuctionRunner
     {

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading;
 
-using DotNetBay.Core.Execution;
 using DotNetBay.Interfaces;
 
-namespace DotNetBay.Core
+namespace DotNetBay.Core.Execution
 {
     public class AuctionRunner : IAuctionRunner, IDisposable
     {

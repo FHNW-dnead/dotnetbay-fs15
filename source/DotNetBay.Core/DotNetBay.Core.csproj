@@ -44,10 +44,10 @@
     <Compile Include="Execution\ProcessedBidEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Execution\Auctioneer.cs" />
-    <Compile Include="AuctionRunner.cs" />
+    <Compile Include="Execution\AuctionRunner.cs" />
     <Compile Include="AuctionService.cs" />
     <Compile Include="IAuctionService.cs" />
-    <Compile Include="IAuctionRunner.cs" />
+    <Compile Include="Execution\IAuctionRunner.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotNetBay.Interfaces\DotNetBay.Interfaces.csproj">
