@@ -25,6 +25,16 @@ namespace DotNetBay.Core
             return this.mainRepository.GetAuctions();
         }
 
+        public Member Add(Member member)
+        {
+            if (this.mainRepository.GetMembers().All(m => m.UniqueId != member.UniqueId))
+            {
+                this.mainRepository.Add(member);
+            }
+
+            return member;
+        }
+
         public Auction Save(Auction auction)
         {
             if (this.mainRepository.GetAuctions().Any(a => a.Id == auction.Id))

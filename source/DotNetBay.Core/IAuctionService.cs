@@ -11,5 +11,7 @@ namespace DotNetBay.Core
         Auction Save(Auction auction);
 
         Bid PlaceBid(Member bidder, Auction auction, double amount);
+
+        Member Add(Member member);
     }
 }
