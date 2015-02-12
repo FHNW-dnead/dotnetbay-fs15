@@ -31,7 +31,7 @@ namespace DotNetBay.Core.Service
                 return this.mainRepository.Update(auction);
             }
 
-            this.ValidateNewAuctionAndThrow(auction);
+            this.ValidateNewAuctionAndThrowOnError(auction);
             return this.mainRepository.Add(auction);
         }
 
@@ -61,7 +61,7 @@ namespace DotNetBay.Core.Service
             return bid;
         }
 
-        private void ValidateNewAuctionAndThrow(Auction auction)
+        private void ValidateNewAuctionAndThrowOnError(Auction auction)
         {
             if (auction == null)
             {

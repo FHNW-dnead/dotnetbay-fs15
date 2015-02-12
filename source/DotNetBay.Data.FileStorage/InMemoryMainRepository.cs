@@ -15,15 +15,6 @@ namespace DotNetBay.Data.FileStorage
 
         private DataRootElement data;
 
-        internal virtual DataRootElement LoadData()
-        {
-            return new DataRootElement();
-        }
-
-        internal virtual void SaveData(DataRootElement data)
-        {
-        }
-
         #region Interface Implementation
 
         public Auction Add(Auction auction)
@@ -212,6 +203,18 @@ namespace DotNetBay.Data.FileStorage
             this.Save();
         }
 
+        #endregion
+
+        #region Factory Methods
+
+        internal virtual DataRootElement LoadData()
+        {
+            return new DataRootElement();
+        }
+
+        internal virtual void SaveData(DataRootElement data)
+        {
+        }
 
         #endregion
 
@@ -320,9 +323,12 @@ namespace DotNetBay.Data.FileStorage
 
         #endregion
 
+        #region Internals
+
         private void EnsureCompleteLoaded()
         {
-            if (!this.isLoaded || this.data == null || this.data.Auctions == null || this.data.Bids == null || this.data.Members == null)
+            if (!this.isLoaded || this.data == null || this.data.Auctions == null || this.data.Bids == null
+                || this.data.Members == null)
             {
                 this.Load();
             }
@@ -355,5 +361,7 @@ namespace DotNetBay.Data.FileStorage
                 this.AfterSave(this.data);
             }
         }
+
+        #endregion
     }
 }

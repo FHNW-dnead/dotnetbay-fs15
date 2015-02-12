@@ -33,9 +33,8 @@ namespace DotNetBay.Core.Service
             // Process all auctions with open bids
             var openAuctions = this.mainRepository.GetAuctions().Where(a => a.Bids.Any(b => b.Accepted == null));
 
-            foreach (var VARIABLE in openAuctions)
+            foreach (var auction in openAuctions)
             {
-                
             }
         }
     }
