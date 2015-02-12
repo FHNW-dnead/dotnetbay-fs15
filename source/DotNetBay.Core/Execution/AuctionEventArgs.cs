@@ -8,6 +8,6 @@ namespace DotNetBay.Core.Execution
     {
         public Auction Auction { get; set; }
 
-        public bool IsSucessfull { get; set; }
+        public bool IsSuccessful { get; set; }
     }
 }

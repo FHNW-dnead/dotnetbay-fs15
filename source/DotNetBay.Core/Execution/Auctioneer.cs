@@ -123,7 +123,7 @@ namespace DotNetBay.Core.Execution
                 this.repository.SaveChanges();
 
                 this.OnAuctionClosed(
-                    new AuctionEventArgs() { Auction = auction, IsSucessfull = auction.Winner != null });
+                    new AuctionEventArgs() { Auction = auction, IsSuccessful = auction.Winner != null });
             }
         }
 

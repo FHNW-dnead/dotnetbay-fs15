@@ -98,25 +98,87 @@ namespace DotNetBay.Test.Core
         [TestCase]
         public void Auction_EndTimeHasArrived_AuctionGetsClosed()
         {
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
             
+            auctioneer.DoAllWork();
+
+            Assert.IsFalse(auction.IsClosed);
+
+            // Turn back the time
+            auction.EndDateTimeUtc = DateTime.UtcNow;
+
+            auctioneer.DoAllWork();
+
+            Assert.IsTrue(auction.IsClosed);
         }
 
         [TestCase]
         public void Auction_WhenClosed_EventIsRaised()
         {
-            Assert.Fail();
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
+
+            AuctionEventArgs raisedArgs = null;
+            auctioneer.AuctionClosed += (sender, args) => raisedArgs = args;
+
+            // Turn back the time
+            auction.EndDateTimeUtc = DateTime.UtcNow;
+
+            auctioneer.DoAllWork();
+
+            Assert.NotNull(raisedArgs);
+            Assert.NotNull(raisedArgs.Auction);
+            Assert.NotNull(raisedArgs.IsSuccessful);
         }
 
         [TestCase]
         public void Bid_WhenAccepted_EventIsRaised()
         {
-            Assert.Fail();
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
+
+            ProcessedBidEventArgs raisedArgs = null;
+            auctioneer.BidAccepted += (sender, args) => raisedArgs = args;
+
+            AddInitialBidToAuction(repo, auction);
+
+            auctioneer.DoAllWork();
+
+            Assert.NotNull(raisedArgs);
+            Assert.NotNull(raisedArgs.Auction);
+            Assert.NotNull(raisedArgs.Bid);
         }
 
         [TestCase]
         public void Bid_WhenDeclined_EventIsRaised()
         {
-            Assert.Fail();
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
+            AddInitialBidToAuction(repo, auction);
+
+            auctioneer.DoAllWork();
+
+            ProcessedBidEventArgs raisedArgs = null;
+            auctioneer.BidDeclined += (sender, args) => raisedArgs = args;
+
+            var bidder2 = new Member() { Name = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
+            repo.Add(bidder2);
+            repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow, Bidder = bidder2, Amount = 51, Auction = auction });
+            
+            auctioneer.DoAllWork();
+
+            Assert.NotNull(raisedArgs);
+            Assert.NotNull(raisedArgs.Auction);
+            Assert.NotNull(raisedArgs.Bid);
         }
 
         private static void AddInitialBidToAuction(InMemoryMainRepository repo, Auction auction)
