@@ -1,7 +1,8 @@
 ﻿using System.Linq;
+
 using DotNetBay.Model;
 
-namespace DotNetBay.Core.Service
+namespace DotNetBay.Core
 {
     public interface IAuctionService
     {

@@ -1,4 +1,4 @@
-﻿namespace DotNetBay.Core.Service
+﻿namespace DotNetBay.Core
 {
     public interface IAuctionRunner
     {

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
+
 using DotNetBay.Interfaces;
 using DotNetBay.Model;
 
-namespace DotNetBay.Core.Service
+namespace DotNetBay.Core
 {
     public class AuctionService : IAuctionService
     {

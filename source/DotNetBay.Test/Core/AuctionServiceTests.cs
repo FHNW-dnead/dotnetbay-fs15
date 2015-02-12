@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-using DotNetBay.Core.Service;
+using DotNetBay.Core;
 using DotNetBay.Data.FileStorage;
 using DotNetBay.Model;
 

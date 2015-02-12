@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 
 using DotNetBay.Interfaces;
 
-namespace DotNetBay.Core.Service
+namespace DotNetBay.Core
 {
     public class AuctionRunner : IAuctionRunner
     {
@@ -12,10 +11,14 @@ namespace DotNetBay.Core.Service
 
         private readonly Timer timer;
 
+        private Auctioneer auctioneer;
+
         public AuctionRunner(IMainRepository mainRepository)
         {
             this.mainRepository = mainRepository;
             this.timer = new Timer(this.Callback, null, Timeout.Infinite, Timeout.Infinite);
+
+            this.auctioneer = new Auctioneer(mainRepository);
         }
 
         public void Start()
@@ -30,12 +33,9 @@ namespace DotNetBay.Core.Service
 
         private void Callback(object state)
         {
-            // Process all auctions with open bids
-            var openAuctions = this.mainRepository.GetAuctions().Where(a => a.Bids.Any(b => b.Accepted == null));
+            this.auctioneer.ProcessOpenBids();
 
-            foreach (var auction in openAuctions)
-            {
-            }
+            this.auctioneer.CloseFinishedAuctions();
         }
     }
 }

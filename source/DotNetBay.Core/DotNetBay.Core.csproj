@@ -40,10 +40,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service\AuctionRunner.cs" />
-    <Compile Include="Service\AuctionService.cs" />
-    <Compile Include="Service\IAuctionService.cs" />
-    <Compile Include="Service\IAuctionRunner.cs" />
+    <Compile Include="Auctioneer.cs" />
+    <Compile Include="AuctionRunner.cs" />
+    <Compile Include="AuctionService.cs" />
+    <Compile Include="IAuctionService.cs" />
+    <Compile Include="IAuctionRunner.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotNetBay.Interfaces\DotNetBay.Interfaces.csproj">
