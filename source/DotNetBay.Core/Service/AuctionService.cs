@@ -43,7 +43,7 @@ namespace DotNetBay.Core.Service
                 throw new ArgumentException("This auction does not exist in the store");
             }
 
-            if (auct.EndDateTimeUtc >= DateTime.UtcNow)
+            if (auct.EndDateTimeUtc <= DateTime.UtcNow)
             {
                 throw new Exception("The requested auction has already closed");
             }
@@ -58,6 +58,52 @@ namespace DotNetBay.Core.Service
             this.mainRepository.Add(bid);
 
             return bid;
+        }
+
+        public void AddAuction(Auction auction)
+        {
+            if (auction == null)
+            {
+                throw new ArgumentException("Auction cannot be null", "auction");
+            }
+
+            if (auction.StartDateTimeUtc < DateTime.UtcNow)
+            {
+                throw new ArgumentException("The start of the auction needs to be in the future", "auction");
+            }
+
+            if (auction.EndDateTimeUtc < DateTime.UtcNow)
+            {
+                throw new ArgumentException("The end of the auction needs to be in the future", "auction");
+            }
+
+            if (auction.Bids != null && auction.Bids.Any())
+            {
+                throw new ArgumentException("A new auction cannot have bids", "auction");
+            }
+
+            if (auction.Seller == null)
+            {
+                throw new ArgumentException("The Seller of an auction cannot be null", "auction");
+            }
+
+            if (auction.Winner != null)
+            {
+                throw new ArgumentException("The Winner of an auction cannot be known at the begin of an auction", "auction");
+            }
+
+            if (auction.StartPrice < 0)
+            {
+                throw new ArgumentException("Negative startprices are not allowed", "auction");
+            }
+
+            if (string.IsNullOrEmpty(auction.Title))
+            {
+                throw new ArgumentException("Every auction needs a title", "auction");
+            }
+
+            this.mainRepository.Add(auction);
+            this.mainRepository.SaveChanges();
         }
     }
 }
