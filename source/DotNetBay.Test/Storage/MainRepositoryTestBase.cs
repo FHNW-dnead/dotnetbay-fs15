@@ -146,7 +146,7 @@ namespace DotNetBay.Test.Storage
         {
             var theSeller = CreateAMember();
             var myAuction = CreateAnAuction();
-            
+
             // References
             myAuction.Seller = theSeller;
 
@@ -163,7 +163,7 @@ namespace DotNetBay.Test.Storage
             using (var factory = this.CreateFactory())
             {
                 var testRepo = factory.CreateMainRepository();
-                
+
                 testRepo.Add(myAuction);
                 testRepo.Add(theBidder);
                 testRepo.Add(bid);
@@ -177,6 +177,44 @@ namespace DotNetBay.Test.Storage
 
             Assert.AreEqual(1, allAuctionsFromRepo[0].Bids.Count);
             Assert.AreEqual(bid, allAuctionsFromRepo[0].Bids[0]);
+        }
+
+        [TestCase]
+        public void GivenARepoWithAuctionAndMember_AddBid_AuctionIsReferencedFromBidder()
+        {
+            var theSeller = CreateAMember();
+            var myAuction = CreateAnAuction();
+
+            // References
+            myAuction.Seller = theSeller;
+
+            var theBidder = CreateAMember();
+            var bid = new Bid()
+            {
+                Auction = myAuction,
+                Bidder = theBidder,
+                Amount = 12
+            };
+
+            List<Member> allMembersFromRepo;
+
+            using (var factory = this.CreateFactory())
+            {
+                var testRepo = factory.CreateMainRepository();
+
+                testRepo.Add(myAuction);
+                testRepo.Add(theBidder);
+                testRepo.Add(bid);
+
+                allMembersFromRepo = testRepo.GetMembers().ToList();
+            }
+
+            // Sanity check
+            Assert.AreEqual(2, allMembersFromRepo.Count());
+            Assert.IsNotNull(allMembersFromRepo[1].Bids);
+
+            Assert.AreEqual(1, allMembersFromRepo[1].Bids.Count);
+            Assert.AreEqual(bid, allMembersFromRepo[1].Bids[0]);
         }
 
         [TestCase]

@@ -26,6 +26,24 @@ namespace DotNetBay.Test.Core
             Assert.AreEqual(auctionFromService, auction);
         }
 
+        [TestMethod]
+        public void WithExistingAuction_AfterPlacingABid_TheBidShouldBeAssignedToAuctionAndUser()
+        {
+            var auction = CreateGeneratedAuction();
+            var bidder = new Member() { Name = "Michael", UniqueId = Guid.NewGuid().ToString() };
+
+            var service = new AuctionService(new InMemoryMainRepository());
+
+            service.Save(auction);
+
+            service.Add(bidder);
+            
+            service.PlaceBid(bidder, auction, 51);
+
+            Assert.AreEqual(1, auction.Bids.Count);
+            Assert.AreEqual(1, bidder.Bids.Count);
+        }
+
         private static Auction CreateGeneratedAuction()
         {
             return new Auction()

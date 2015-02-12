@@ -162,7 +162,19 @@ namespace DotNetBay.Data.FileStorage
                 var auction = this.data.Auctions.FirstOrDefault(a => a.Id == bid.Auction.Id);
                 auction.Bids.Add(bid);
 
-                return null;
+
+                // Reference back from bidder
+                var bidder = this.data.Members.FirstOrDefault(b => b.UniqueId == bid.Bidder.UniqueId);
+                if (bidder.Bids == null)
+                {
+                    bidder.Bids = new List<Bid>(new[] { bid });
+                }
+                else if (!bidder.Bids.Contains(bid))
+                {
+                    bidder.Bids.Add(bid);
+                }
+
+                return bid;
             }
         }
 
