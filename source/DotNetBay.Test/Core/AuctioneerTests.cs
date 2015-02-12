@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DotNetBay.Test.Core
 {
@@ -26,6 +25,24 @@ namespace DotNetBay.Test.Core
 
         [TestMethod]
         public void Auction_GetsOlderAndHigherBid_HasNoImpact()
+        {
+            Assert.Fail();
+        }
+
+        [TestMethod]
+        public void Auction_WhenClosed_EventIsRaised()
+        {
+            Assert.Fail();
+        }
+
+        [TestMethod]
+        public void Bid_WhenAccepted_EventIsRaised()
+        {
+            Assert.Fail();
+        }
+
+        [TestMethod]
+        public void Bid_WhenDeclined_EventIsRaised()
         {
             Assert.Fail();
         }
