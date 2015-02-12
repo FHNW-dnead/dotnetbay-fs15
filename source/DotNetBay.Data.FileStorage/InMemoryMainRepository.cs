@@ -266,7 +266,7 @@ namespace DotNetBay.Data.FileStorage
             this.ThrowIfReferenceNotFound(auction, x => x.Seller, this.data.Members, r => r.UniqueId);
             this.ThrowIfReferenceNotFound(auction, x => x.Winner, this.data.Members, r => r.UniqueId);
         }
-
+        
         private void ThrowForInvalidReferences(Bid bid)
         {
             this.ThrowIfReferenceNotFound(bid, x => x.Auction, this.data.Auctions, r => r.Id);
