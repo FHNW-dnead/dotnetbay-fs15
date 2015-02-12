@@ -51,6 +51,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Core\AuctionServiceTests.cs" />
+    <Compile Include="Core\AuctioneerTests.cs" />
     <Compile Include="Storage\FileSystemMainRepositoryTests.cs" />
     <Compile Include="Storage\TempDirectory.cs" />
     <Compile Include="Storage\TempFile.cs" />

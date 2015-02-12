@@ -45,6 +45,11 @@ namespace DotNetBay.Core
                 throw new ArgumentException("This auction does not exist in the store");
             }
 
+            if (auct.StartDateTimeUtc < DateTime.UtcNow)
+            {
+                throw new Exception("The requested auction has not started yet");
+            }
+
             if (auct.EndDateTimeUtc <= DateTime.UtcNow)
             {
                 throw new Exception("The requested auction has already closed");
@@ -52,6 +57,8 @@ namespace DotNetBay.Core
 
             var bid = new Bid()
             {
+                ReceivedOnUtc = DateTime.UtcNow,
+                Accepted = null,
                 Auction = auct,
                 Amount = amount,
                 Bidder = bidder

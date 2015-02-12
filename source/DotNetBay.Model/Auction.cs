@@ -38,19 +38,8 @@ namespace DotNetBay.Model
 
         public List<Bid> Bids { get; set; }
 
-        public bool HasStarted
-        {
-            get { return this.StartDateTimeUtc <= DateTime.UtcNow; }
-        }
+        public Bid LastBid { get; set; }
 
-        public bool IsFinished
-        {
-            get { return this.EndDateTimeUtc <= DateTime.UtcNow; }
-        }
-
-        public bool IsSuccessful
-        {
-            get { return this.Winner != null; }
-        }
+        public bool IsClosed { get; set; }
     }
 }

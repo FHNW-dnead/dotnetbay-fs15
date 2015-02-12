@@ -9,13 +9,21 @@ namespace DotNetBay.Core
     {
         private readonly IMainRepository mainRepository;
 
+        private readonly TimeSpan checkInterval;
+
         private readonly Timer timer;
 
-        private Auctioneer auctioneer;
+        private readonly Auctioneer auctioneer;
 
         public AuctionRunner(IMainRepository mainRepository)
+            : this(mainRepository, TimeSpan.FromSeconds(5))
+        {
+        }
+
+        public AuctionRunner(IMainRepository mainRepository, TimeSpan checkInterval)
         {
             this.mainRepository = mainRepository;
+            this.checkInterval = checkInterval;
             this.timer = new Timer(this.Callback, null, Timeout.Infinite, Timeout.Infinite);
 
             this.auctioneer = new Auctioneer(mainRepository);
@@ -23,7 +31,7 @@ namespace DotNetBay.Core
 
         public void Start()
         {
-            this.timer.Change(TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+            this.timer.Change(this.checkInterval, this.checkInterval);
         }
 
         public void Stop()
