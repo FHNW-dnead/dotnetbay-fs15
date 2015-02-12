@@ -3,7 +3,7 @@ using System.Linq;
 
 using DotNetBay.Interfaces;
 
-namespace DotNetBay.Core
+namespace DotNetBay.Core.Execution
 {
     public class Auctioneer
     {
