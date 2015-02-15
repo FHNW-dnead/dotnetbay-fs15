@@ -6,7 +6,7 @@ namespace DotNetBay.Core
 {
     public interface IAuctionService
     {
-        IQueryable<Auction> GetAuctions();
+        IQueryable<Auction> GetAll();
 
         Auction Save(Auction auction);
 

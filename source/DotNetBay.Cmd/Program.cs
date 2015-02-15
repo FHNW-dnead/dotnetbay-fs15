@@ -24,7 +24,7 @@ namespace DotNetBay.Cmd
             Console.WriteLine("Started AuctionRunner");
             auctionRunner.Start();
 
-            var allAuctions = auctionService.GetAuctions();
+            var allAuctions = auctionService.GetAll();
 
             Console.WriteLine("Found {0} auctions returned by the service.", allAuctions.Count());
 

@@ -15,12 +15,12 @@ namespace DotNetBay.Core
             this.mainRepository = mainRepository;
         }
 
-        public Auction GetAuctionById(long id)
+        public Auction GetById(long id)
         {
-            return this.GetAuctions().FirstOrDefault(a => a.Id == id);
+            return this.GetAll().FirstOrDefault(a => a.Id == id);
         }
 
-        public IQueryable<Auction> GetAuctions()
+        public IQueryable<Auction> GetAll()
         {
             return this.mainRepository.GetAuctions();
         }

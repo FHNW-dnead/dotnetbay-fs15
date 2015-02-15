@@ -21,7 +21,7 @@ namespace DotNetBay.Test.Core
             var auction = CreateGeneratedAuction();
             service.Save(auction);
 
-            var auctionFromService = service.GetAuctions().First();
+            var auctionFromService = service.GetAll().First();
             Assert.AreEqual(auctionFromService, auction);
         }
 
