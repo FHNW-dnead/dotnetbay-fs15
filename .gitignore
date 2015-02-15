@@ -6,6 +6,10 @@
 *.user
 *.sln.docstates
 
+# NCrunch
+*.ncrunchsolution
+*.ncrunchproject
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
