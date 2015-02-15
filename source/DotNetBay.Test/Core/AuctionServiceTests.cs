@@ -31,11 +31,14 @@ namespace DotNetBay.Test.Core
             var auction = CreateGeneratedAuction();
             var bidder = new Member() { Name = "Michael", UniqueId = Guid.NewGuid().ToString() };
 
-            var service = new AuctionService(new InMemoryMainRepository());
+            var inMemoryMainRepository = new InMemoryMainRepository();
+
+            var service = new AuctionService(inMemoryMainRepository);
+            var memberService = new MemberService(inMemoryMainRepository);
 
             service.Save(auction);
 
-            service.Add(bidder);
+            memberService.Add(bidder);
             
             service.PlaceBid(bidder, auction, 51);
 
