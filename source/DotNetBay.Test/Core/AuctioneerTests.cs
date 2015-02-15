@@ -116,6 +116,29 @@ namespace DotNetBay.Test.Core
         }
 
         [TestCase]
+        public void Auction_HasOneBidAndGetsClose_TheBidderShouldBeTheWinner()
+        {
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
+
+            auctioneer.DoAllWork();
+
+            var bidder2 = new Member() { Name = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
+            repo.Add(bidder2);
+            repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow, Bidder = bidder2, Amount = 70, Auction = auction });
+
+            // Turn back the time
+            auction.EndDateTimeUtc = DateTime.UtcNow;
+
+            auctioneer.DoAllWork();
+
+            Assert.IsTrue(auction.IsClosed);
+            Assert.AreEqual(auction.Winner, bidder2);
+        }
+
+        [TestCase]
         public void Auction_WhenClosed_EventIsRaised()
         {
             var repo = new InMemoryMainRepository();
