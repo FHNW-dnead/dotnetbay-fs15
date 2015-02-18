@@ -16,9 +16,14 @@ namespace DotNetBay.Test.Core
         [TestCase]
         public void GivenAProperService_SavesAValidAuction_ShouldReturnSameFromAuctionList()
         {
-            var service = new AuctionService(new InMemoryMainRepository());
+            var repo = new InMemoryMainRepository();
+            var userService = new SimpleMemberService(repo);
+            var service = new AuctionService(repo, userService);
 
             var auction = CreateGeneratedAuction();
+
+            auction.Seller = userService.Add("Seller", "seller@mail.com");
+
             service.Save(auction);
 
             var auctionFromService = service.GetAll().First();
@@ -28,17 +33,19 @@ namespace DotNetBay.Test.Core
         [TestCase]
         public void WithExistingAuction_AfterPlacingABid_TheBidShouldBeAssignedToAuctionAndUser()
         {
+            var repo = new InMemoryMainRepository();
+            var userService = new SimpleMemberService(repo);
+            var service = new AuctionService(repo, userService);
+
             var auction = CreateGeneratedAuction();
-            var bidder = new Member() { DisplayName = "Michael", UniqueId = Guid.NewGuid().ToString() };
 
-            var inMemoryMainRepository = new InMemoryMainRepository();
+            auction.Seller = userService.Add("Seller", "seller@mail.com");
 
-            var service = new AuctionService(inMemoryMainRepository);
-            var memberService = new SimpleMemberService(inMemoryMainRepository);
+            var memberService = userService;
 
             service.Save(auction);
 
-            memberService.Add(bidder);
+            var bidder = memberService.Add("Michael", "michael.schnyder@fhnw.ch");
             
             service.PlaceBid(bidder, auction, 51);
 
@@ -46,16 +53,24 @@ namespace DotNetBay.Test.Core
             Assert.AreEqual(1, bidder.Bids.Count);
         }
 
+        [TestCase]
+        [ExpectedException(typeof(ArgumentException))]
+        public void WhenAddingAnAuction_WithUnknownMember_RaisesException()
+        {
+            var auction = CreateGeneratedAuction();
+
+            var repo = new InMemoryMainRepository();
+
+            var service = new AuctionService(repo, new SimpleMemberService(repo));
+            var memberService = new SimpleMemberService(repo);
+
+            service.Save(auction);
+        }
+
         private static Auction CreateGeneratedAuction()
         {
             return new Auction()
                        {
-                           Seller =
-                               new Member()
-                                   {
-                                       UniqueId = Guid.NewGuid().ToString(),
-                                       DisplayName = "AGeneratedMember"
-                                   },
                            Title = "Generated Auction",
                            StartPrice = 50.5,
                            StartDateTimeUtc = DateTime.UtcNow.AddHours(1),
