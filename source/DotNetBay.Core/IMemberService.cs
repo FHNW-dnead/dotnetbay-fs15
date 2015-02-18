@@ -8,9 +8,11 @@ namespace DotNetBay.Core
     {
         Member GetCurrentMember();
 
-        Member Add(Member member);
+        Member GetByUniqueId(string uniqueId);
 
-        bool Save(Member member);
+        Member Add(string displayName, string mail);
+
+        Member Save(Member member);
 
         IEnumerable<Member> GetAll();
     }

@@ -18,7 +18,7 @@ namespace DotNetBay.Cmd
 
             var store = new FileSystemMainRepository("store.json");
             
-            var auctionService = new AuctionService(store);
+            var auctionService = new AuctionService(store, new SimpleMemberService(store));
             var auctionRunner = new AuctionRunner(store);
             
             Console.WriteLine("Started AuctionRunner");

@@ -38,24 +38,53 @@ namespace DotNetBay.Core
             return member;
         }
 
-        public Member Add(Member member)
+        public Member Add(string displayName, string mail)
         {
-            if (this.repository.GetMembers().All(m => m.UniqueId != member.UniqueId))
+            var uniqueId = mail;
+
+            if (this.repository.GetMembers().All(m => m.UniqueId != uniqueId))
             {
+                var member = new Member()
+                                    {
+                                        UniqueId = uniqueId,
+                                        DisplayName = displayName,
+                                        EMail = mail
+                                    };
+
                 this.repository.Add(member);
+                this.repository.SaveChanges();
+
+                return member;
             }
 
-            return member;
+            return null;
         }
 
-        public bool Save(Member member)
+        public Member Save(Member member)
         {
-            throw new NotImplementedException();
+            var foundMember = this.repository.GetMembers().FirstOrDefault(m => m.UniqueId == member.UniqueId);
+
+            if (foundMember == null)
+            {
+                throw new ArgumentException("Cannot save an unknown member");
+            }
+            
+            foundMember.DisplayName = member.DisplayName;
+            foundMember.EMail = member.DisplayName;
+
+            this.repository.SaveChanges();
+
+            return foundMember;
         }
 
         public IEnumerable<Member> GetAll()
         {
-            throw new NotImplementedException();
+            return this.repository.GetMembers();
+        }
+
+        public Member GetByUniqueId(string uniqueId)
+        {
+            return this.repository.GetMembers().FirstOrDefault(m => m.UniqueId == uniqueId);
         }
     }
 }
