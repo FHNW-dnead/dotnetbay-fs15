@@ -29,12 +29,12 @@ namespace DotNetBay.Test.Core
         public void WithExistingAuction_AfterPlacingABid_TheBidShouldBeAssignedToAuctionAndUser()
         {
             var auction = CreateGeneratedAuction();
-            var bidder = new Member() { Name = "Michael", UniqueId = Guid.NewGuid().ToString() };
+            var bidder = new Member() { DisplayName = "Michael", UniqueId = Guid.NewGuid().ToString() };
 
             var inMemoryMainRepository = new InMemoryMainRepository();
 
             var service = new AuctionService(inMemoryMainRepository);
-            var memberService = new MemberService(inMemoryMainRepository);
+            var memberService = new SimpleMemberService(inMemoryMainRepository);
 
             service.Save(auction);
 
@@ -54,7 +54,7 @@ namespace DotNetBay.Test.Core
                                new Member()
                                    {
                                        UniqueId = Guid.NewGuid().ToString(),
-                                       Name = "AGeneratedMember"
+                                       DisplayName = "AGeneratedMember"
                                    },
                            Title = "Generated Auction",
                            StartPrice = 50.5,

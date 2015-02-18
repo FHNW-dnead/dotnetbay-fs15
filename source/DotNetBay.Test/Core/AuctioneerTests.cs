@@ -24,7 +24,7 @@ namespace DotNetBay.Test.Core
             
             auctioneer.DoAllWork();
 
-            var bidder2 = new Member() { Name = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
+            var bidder2 = new Member() { DisplayName = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
             repo.Add(bidder2);
             repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow, Bidder = bidder2, Amount = 51, Auction = auction });
 
@@ -45,7 +45,7 @@ namespace DotNetBay.Test.Core
 
             auctioneer.DoAllWork();
 
-            var bidder2 = new Member() { Name = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
+            var bidder2 = new Member() { DisplayName = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
             repo.Add(bidder2);
             repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow, Bidder = bidder2, Amount = 70, Auction = auction });
 
@@ -66,7 +66,7 @@ namespace DotNetBay.Test.Core
 
             auctioneer.DoAllWork();
 
-            var bidder2 = new Member() { Name = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
+            var bidder2 = new Member() { DisplayName = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
             repo.Add(bidder2);
             repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow.AddMinutes(-10), Bidder = bidder2, Amount = 51, Auction = auction });
 
@@ -88,7 +88,7 @@ namespace DotNetBay.Test.Core
 
             auctioneer.DoAllWork();
 
-            var bidder2 = new Member() { Name = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
+            var bidder2 = new Member() { DisplayName = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
             repo.Add(bidder2);
             repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow.AddMinutes(-10), Bidder = bidder2, Amount = 70, Auction = auction });
 
@@ -125,7 +125,7 @@ namespace DotNetBay.Test.Core
 
             auctioneer.DoAllWork();
 
-            var bidder2 = new Member() { Name = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
+            var bidder2 = new Member() { DisplayName = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
             repo.Add(bidder2);
             repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow, Bidder = bidder2, Amount = 70, Auction = auction });
 
@@ -193,7 +193,7 @@ namespace DotNetBay.Test.Core
             ProcessedBidEventArgs raisedArgs = null;
             auctioneer.BidDeclined += (sender, args) => raisedArgs = args;
 
-            var bidder2 = new Member() { Name = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
+            var bidder2 = new Member() { DisplayName = "Bidder2", UniqueId = Guid.NewGuid().ToString() };
             repo.Add(bidder2);
             repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow, Bidder = bidder2, Amount = 51, Auction = auction });
             
@@ -206,7 +206,7 @@ namespace DotNetBay.Test.Core
 
         private static void AddInitialBidToAuction(InMemoryMainRepository repo, Auction auction)
         {
-            var bidder = new Member() { Name = "Bidder1", UniqueId = Guid.NewGuid().ToString() };
+            var bidder = new Member() { DisplayName = "Bidder1", UniqueId = Guid.NewGuid().ToString() };
             repo.Add(bidder);
 
             repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow, Auction = auction, Amount = auction.StartPrice + 10, Bidder = bidder });
@@ -214,7 +214,7 @@ namespace DotNetBay.Test.Core
 
         private static Auction CreateAndStoreAuction(InMemoryMainRepository repo, DateTime startDateTimeUtc, DateTime endDateTimeUtc)
         {
-            var seller = new Member() { Name = "Seller", UniqueId = Guid.NewGuid().ToString() };
+            var seller = new Member() { DisplayName = "Seller", UniqueId = Guid.NewGuid().ToString() };
             var auction = new Auction() { Title = "TestAuction", Seller = seller, StartPrice = 50, StartDateTimeUtc = startDateTimeUtc, EndDateTimeUtc = endDateTimeUtc };
 
             repo.Add(seller);

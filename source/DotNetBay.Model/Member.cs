@@ -11,7 +11,9 @@ namespace DotNetBay.Model
 
         public string UniqueId { get; set; }
 
-        public string Name { get; set; }
+        public string DisplayName { get; set; }
+
+        public string EMail { get; set; }
 
         public List<Auction> Auctions { get; set; }
 
