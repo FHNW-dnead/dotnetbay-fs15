@@ -440,7 +440,7 @@ namespace DotNetBay.Test.Storage
         {
             return new Member()
             {
-                Name = "GeneratedMember",
+                DisplayName = "GeneratedMember",
                 UniqueId = "UniqueId" + Guid.NewGuid()
             };
         }
