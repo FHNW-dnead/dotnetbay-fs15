@@ -1,10 +1,13 @@
-﻿using DotNetBay.Core;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using DotNetBay.Core;
 using DotNetBay.Data.FileStorage;
 
 using NUnit.Framework;
 
 namespace DotNetBay.Test.Core
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "This is a testclass")]
     public class MemberServiceTest
     {
         [TestCase]
