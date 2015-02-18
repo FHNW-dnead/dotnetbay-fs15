@@ -11,9 +11,9 @@ namespace DotNetBay.Core.Execution
 
         private readonly TimeSpan checkInterval;
 
-        private readonly Timer timer;
-
         private readonly Auctioneer auctioneer;
+        
+        private Timer timer;
 
         public AuctionRunner(IMainRepository repository)
             : this(repository, TimeSpan.FromSeconds(5))
@@ -49,7 +49,24 @@ namespace DotNetBay.Core.Execution
 
         public void Dispose()
         {
-            this.timer.Dispose();
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // free managed resources
+                if (this.timer != null)
+                {
+                    this.timer.Dispose();
+                    this.timer = null;
+                }
+            }
+
+            // free native resources if there are any.
         }
 
         private void Callback(object state)
