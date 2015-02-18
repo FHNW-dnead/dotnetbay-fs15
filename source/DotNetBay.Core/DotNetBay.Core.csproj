@@ -43,7 +43,7 @@
     <Compile Include="Execution\IAuctioneer.cs" />
     <Compile Include="Execution\ProcessedBidEventArgs.cs" />
     <Compile Include="IMemberService.cs" />
-    <Compile Include="MemberService.cs" />
+    <Compile Include="SimpleMemberService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Execution\Auctioneer.cs" />
     <Compile Include="Execution\AuctionRunner.cs" />
