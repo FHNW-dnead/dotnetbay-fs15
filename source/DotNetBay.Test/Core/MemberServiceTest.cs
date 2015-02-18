@@ -8,7 +8,7 @@ namespace DotNetBay.Test.Core
     public class MemberServiceTest
     {
         [TestCase]
-        public void WhenCurrentUserIsNotInRepo_GetCurrentUser_AlwaysGetAMember()
+        public void WhenMemberIsNotInRepo_GetCurrentUser_AlwaysGetAMember()
         {
             var repo = new InMemoryMainRepository();
             var service = new SimpleMemberService(repo);
