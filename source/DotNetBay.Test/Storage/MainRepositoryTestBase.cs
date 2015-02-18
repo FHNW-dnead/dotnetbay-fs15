@@ -71,7 +71,7 @@ namespace DotNetBay.Test.Storage
         }
 
         [TestCase]
-        public void GivenAnEmptyRepo_AddAMemberWithAuctions_MemberAndAuctionsAreRepodIndividually()
+        public void GivenAnEmptyRepo_AddAMemberWithAuctions_MemberAndAuctionsAreInRepoIndividually()
         {
             var myAuction = CreateAnAuction();
             var myMember = CreateAMember();
