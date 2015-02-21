@@ -36,6 +36,16 @@ namespace DotNetBay.Test.Storage
         }
 
         [TestCase]
+        public void GivenANewRepository_CanBeSaved_WithNoIssues()
+        {
+            using (var factory = this.CreateFactory())
+            {
+                var initRepo = factory.CreateMainRepository();
+                initRepo.SaveChanges();
+            }
+        }
+
+        [TestCase]
         public void GivenAnEmptyRepo_AddAuctionWithSeller_AuctionAndMemberAreRepodIndividually()
         {
             var myAuction = CreateAnAuction();

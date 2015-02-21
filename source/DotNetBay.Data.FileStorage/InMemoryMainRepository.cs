@@ -209,9 +209,14 @@ namespace DotNetBay.Data.FileStorage
 
         public virtual void SaveChanges()
         {
-            this.ThrowForInvalidReferences();
+            lock (this.syncRoot)
+            {
+                this.EnsureCompleteLoaded();
 
-            this.Save();
+                this.ThrowForInvalidReferences();
+
+                this.Save();
+            }
         }
 
         #endregion
