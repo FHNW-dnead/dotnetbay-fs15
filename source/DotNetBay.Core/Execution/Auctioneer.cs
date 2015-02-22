@@ -20,12 +20,16 @@ namespace DotNetBay.Core.Execution
 
         public event EventHandler<ProcessedBidEventArgs> BidAccepted;
 
+        public event EventHandler<AuctionEventArgs> AuctionStarted; 
+
         public event EventHandler<AuctionEventArgs> AuctionClosed;
 
         #endregion
 
         public void DoAllWork()
         {
+            this.StartPendingAuctions();
+
             this.ProcessOpenBids();
 
             this.CloseFinishedAuctions();
@@ -51,6 +55,15 @@ namespace DotNetBay.Core.Execution
             }
         }
 
+        protected virtual void OnAuctionStarted(AuctionEventArgs e)
+        {
+            var handler = this.AuctionStarted;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
         protected virtual void OnAuctionClosed(AuctionEventArgs e)
         {
             var handler = this.AuctionClosed;
@@ -63,6 +76,21 @@ namespace DotNetBay.Core.Execution
         #endregion
 
         #region The Magic itself
+
+        private void StartPendingAuctions()
+        {
+            // Process all auctions which should be closed
+            var auctionsToStart = this.repository.GetAuctions().Where(a => !a.IsRunning && a.StartDateTimeUtc < DateTime.UtcNow).ToList();
+
+            foreach (var auction in auctionsToStart)
+            {
+                auction.IsRunning = true;
+
+                this.OnAuctionStarted(new AuctionEventArgs() { Auction = auction, IsSuccessful = true });
+            }
+
+            this.repository.SaveChanges();
+        }
 
         private void ProcessOpenBids()
         {
@@ -117,6 +145,7 @@ namespace DotNetBay.Core.Execution
                     auction.Winner = auction.ActiveBid.Bidder;
                 }
 
+                auction.IsRunning = false;
                 auction.IsClosed = true;
                 auction.CloseDateTimeUtc = DateTime.UtcNow;
 

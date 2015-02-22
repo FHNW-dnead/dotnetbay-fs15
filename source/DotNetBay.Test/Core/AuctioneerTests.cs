@@ -102,7 +102,7 @@ namespace DotNetBay.Test.Core
             var auctioneer = new Auctioneer(repo);
 
             var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
-            
+
             auctioneer.DoAllWork();
 
             Assert.IsFalse(auction.IsClosed);
@@ -113,6 +113,30 @@ namespace DotNetBay.Test.Core
             auctioneer.DoAllWork();
 
             Assert.IsTrue(auction.IsClosed);
+            Assert.IsFalse(auction.IsRunning);
+        }
+
+        [TestCase]
+        public void Auction_StartTimeHasArrived_AuctionGetsRunning()
+        {
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
+
+            Assert.IsFalse(auction.IsRunning);
+
+            auctioneer.DoAllWork();
+
+            Assert.IsTrue(auction.IsRunning);
+
+            // Turn back the time
+            auction.EndDateTimeUtc = DateTime.UtcNow;
+
+            auctioneer.DoAllWork();
+
+            Assert.IsTrue(auction.IsClosed);
+            Assert.IsFalse(auction.IsRunning);
         }
 
         [TestCase]
@@ -136,6 +160,24 @@ namespace DotNetBay.Test.Core
 
             Assert.IsTrue(auction.IsClosed);
             Assert.AreEqual(auction.Winner, bidder2);
+        }
+
+        [TestCase]
+        public void Auction_WhenStarted_EventIsRaised()
+        {
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
+
+            AuctionEventArgs raisedArgs = null;
+            auctioneer.AuctionStarted += (sender, args) => raisedArgs = args;
+
+            auctioneer.DoAllWork();
+
+            Assert.NotNull(raisedArgs);
+            Assert.NotNull(raisedArgs.Auction);
+            Assert.AreEqual(auction, raisedArgs.Auction);
         }
 
         [TestCase]

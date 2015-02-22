@@ -46,5 +46,7 @@ namespace DotNetBay.Model
         public Bid ActiveBid { get; set; }
 
         public bool IsClosed { get; set; }
+
+        public bool IsRunning { get; set; }
     }
 }
