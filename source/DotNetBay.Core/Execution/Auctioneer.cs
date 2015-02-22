@@ -22,7 +22,7 @@ namespace DotNetBay.Core.Execution
 
         public event EventHandler<AuctionEventArgs> AuctionStarted; 
 
-        public event EventHandler<AuctionEventArgs> AuctionClosed;
+        public event EventHandler<AuctionEventArgs> AuctionEnded;
 
         #endregion
 
@@ -32,7 +32,7 @@ namespace DotNetBay.Core.Execution
 
             this.ProcessOpenBids();
 
-            this.CloseFinishedAuctions();
+            this.EndAndCloseFinishedAuctions();
         }
 
         #region Event Invocation
@@ -64,9 +64,9 @@ namespace DotNetBay.Core.Execution
             }
         }
 
-        protected virtual void OnAuctionClosed(AuctionEventArgs e)
+        protected virtual void OnAuctionEnded(AuctionEventArgs e)
         {
-            var handler = this.AuctionClosed;
+            var handler = this.AuctionEnded;
             if (handler != null)
             {
                 handler(this, e);
@@ -126,11 +126,10 @@ namespace DotNetBay.Core.Execution
             this.repository.SaveChanges();
         }
 
-        private void CloseFinishedAuctions()
+        private void EndAndCloseFinishedAuctions()
         {
             // Process all auctions which should be closed
-            var auctionsToClose =
-                this.repository.GetAuctions().Where(a => !a.IsClosed && a.EndDateTimeUtc <= DateTime.UtcNow).ToList();
+            var auctionsToClose = this.repository.GetAuctions().Where(a => !a.IsClosed && a.EndDateTimeUtc <= DateTime.UtcNow).ToList();
 
             foreach (var auction in auctionsToClose)
             {
@@ -151,7 +150,7 @@ namespace DotNetBay.Core.Execution
 
                 this.repository.SaveChanges();
 
-                this.OnAuctionClosed(
+                this.OnAuctionEnded(
                     new AuctionEventArgs() { Auction = auction, IsSuccessful = auction.Winner != null });
             }
         }
