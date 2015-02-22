@@ -14,6 +14,27 @@ namespace DotNetBay.Test.Core
     public class AuctioneerTests
     {
         [TestCase]
+        public void Auction_BidIsBelowStartPrice_HasNoImpact()
+        {
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow, DateTime.UtcNow.AddHours(1));
+            
+            auctioneer.DoAllWork();
+
+            var bidder = new Member() { DisplayName = "Bidder1", UniqueId = Guid.NewGuid().ToString() };
+            repo.Add(bidder);
+
+            repo.Add(new Bid() { ReceivedOnUtc = DateTime.UtcNow, Auction = auction, Amount = auction.StartPrice - 10, Bidder = bidder });
+
+            auctioneer.DoAllWork();
+
+            Assert.AreEqual(1, auction.Bids.Count);
+            Assert.IsNull(auction.ActiveBid);
+        }
+
+        [TestCase]
         public void Auction_HasNewerButLowerBid_HasNoImpact()
         {
             var repo = new InMemoryMainRepository();

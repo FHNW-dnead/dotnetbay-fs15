@@ -103,11 +103,11 @@ namespace DotNetBay.Core.Execution
 
                 foreach (var bid in openBids)
                 {
-                    if (bid.Amount > auction.CurrentPrice)
+                    if (bid.Amount > Math.Max(auction.CurrentPrice, auction.StartPrice))
                     {
                         if (auction.ActiveBid != null && bid.ReceivedOnUtc < auction.ActiveBid.ReceivedOnUtc)
                         {
-                            throw new ApplicationException("Cannot handle higher bids which where look like coming from history!");
+                            throw new ApplicationException("Cannot handle higher bids which look like coming from history!");
                         }
 
                         bid.Accepted = true;
