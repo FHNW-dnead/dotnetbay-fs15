@@ -11,11 +11,14 @@ namespace DotNetBay.Data.FileStorage
         private readonly JsonSerializerSettings jsonSerializerSettings;
         private readonly string rootDirectory;
 
+        private readonly string binaryDataDirectory;
+
         public FileSystemMainRepository(string fileName)
         {
             // It's good practice to expect either absolute or relative paths and handle both the same
             this.fullPath = Path.GetFullPath(fileName);
             this.rootDirectory = Path.GetDirectoryName(this.fullPath);
+            this.binaryDataDirectory = Path.Combine(this.rootDirectory, "data");
 
             this.jsonSerializerSettings = new JsonSerializerSettings
             {
@@ -61,7 +64,7 @@ namespace DotNetBay.Data.FileStorage
         internal override void BeforeLoad(DataRootElement data)
         {
             // Ensure existence of directory
-            Directory.CreateDirectory(this.rootDirectory);
+            Directory.CreateDirectory(this.binaryDataDirectory);
         }
 
         internal override void AfterSave(DataRootElement data)
@@ -76,7 +79,7 @@ namespace DotNetBay.Data.FileStorage
         internal override void BeforeSave(DataRootElement data)
         {
             // Ensure existence of directory
-            Directory.CreateDirectory(this.rootDirectory);
+            Directory.CreateDirectory(this.binaryDataDirectory);
 
             // Remove byte values from images and save individually
             foreach (var auction in data.Auctions)
@@ -92,7 +95,7 @@ namespace DotNetBay.Data.FileStorage
 
         private void SaveBinary(string fileName, byte[] fileContent)
         {
-            var fullFileName = Path.Combine(this.rootDirectory, fileName);
+            var fullFileName = Path.Combine(this.binaryDataDirectory, fileName);
 
             if (fileContent == null)
             {
@@ -113,7 +116,7 @@ namespace DotNetBay.Data.FileStorage
 
         private byte[] LoadBinary(string fileName)
         {
-            var fullFileName = Path.Combine(this.rootDirectory, fileName);
+            var fullFileName = Path.Combine(this.binaryDataDirectory, fileName);
 
             if (File.Exists(fullFileName))
             {
