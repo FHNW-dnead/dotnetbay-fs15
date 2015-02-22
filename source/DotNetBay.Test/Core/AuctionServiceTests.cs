@@ -45,6 +45,9 @@ namespace DotNetBay.Test.Core
 
             service.Save(auction);
 
+            // Litte hack: Manual change of start time
+            auction.StartDateTimeUtc = DateTime.UtcNow.AddDays(-1);
+
             var bidder = memberService.Add("Michael", "michael.schnyder@fhnw.ch");
             
             service.PlaceBid(bidder, auction, 51);
@@ -65,6 +68,42 @@ namespace DotNetBay.Test.Core
             var memberService = new SimpleMemberService(repo);
 
             service.Save(auction);
+        }
+
+        [TestCase]
+        [ExpectedException(typeof(Exception))]
+        public void PlacingABid_AuctionHasNotYetStarted_RaisesExecption()
+        {
+            var repo = new InMemoryMainRepository();
+            var simpleMemberService = new SimpleMemberService(repo);
+            var auction = CreateGeneratedAuction();
+            auction.Seller = simpleMemberService.GetCurrentMember();
+
+            var service = new AuctionService(repo, simpleMemberService);
+
+            auction.StartDateTimeUtc = DateTime.UtcNow.AddDays(1);
+            service.Save(auction);
+
+            service.PlaceBid(simpleMemberService.GetCurrentMember(), auction, 100);
+        }
+
+        [TestCase]
+        [ExpectedException(typeof(Exception))]
+        public void PlacingABid_AuctionHasExpired_RaisesExecption()
+        {
+            var repo = new InMemoryMainRepository();
+            var simpleMemberService = new SimpleMemberService(repo);
+            var auction = CreateGeneratedAuction();
+            auction.Seller = simpleMemberService.GetCurrentMember();
+
+            var service = new AuctionService(repo, simpleMemberService);
+
+            auction.StartDateTimeUtc = DateTime.UtcNow.AddDays(-2);
+            auction.EndDateTimeUtc = DateTime.UtcNow.AddDays(-2);
+            
+            repo.Add(auction);
+
+            service.PlaceBid(simpleMemberService.GetCurrentMember(), auction, 100);
         }
 
         private static Auction CreateGeneratedAuction()

@@ -48,7 +48,7 @@ namespace DotNetBay.Core
                 throw new ArgumentException("This auction does not exist in the store");
             }
 
-            if (auct.StartDateTimeUtc < DateTime.UtcNow)
+            if (auct.StartDateTimeUtc > DateTime.UtcNow)
             {
                 throw new Exception("The requested auction has not started yet");
             }
