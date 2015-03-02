@@ -148,11 +148,18 @@ namespace DotNetBay.Core.Execution
                 auction.IsClosed = true;
                 auction.CloseDateTimeUtc = DateTime.UtcNow;
 
-                this.repository.SaveChanges();
-
-                this.OnAuctionEnded(
-                    new AuctionEventArgs() { Auction = auction, IsSuccessful = auction.Winner != null });
+                this.OnAuctionEnded(new AuctionEventArgs() { Auction = auction, IsSuccessful = auction.Winner != null });
             }
+
+            // Sync IsRunning from IsClosed
+            var auctionsToSync = this.repository.GetAuctions().Where(a => a.IsClosed && a.IsRunning).ToList();
+
+            foreach (var auction in auctionsToSync)
+            {
+                auction.IsRunning = false;
+            }
+
+            this.repository.SaveChanges();
         }
 
         #endregion

@@ -175,6 +175,22 @@ namespace DotNetBay.Test.Core
         }
 
         [TestCase]
+        public void AuctionIsClosed_AuctioneerRuns_AuctionIsNotRunning()
+        {
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(-1));
+            auction.IsRunning = true;
+            auction.IsClosed = true;
+
+            auctioneer.DoAllWork();
+
+            Assert.IsTrue(auction.IsClosed);
+            Assert.IsFalse(auction.IsRunning);
+        }
+
+        [TestCase]
         public void AuctionStartedAndEndedInThePast_AuctioneerRuns_DontGetsStarted()
         {
             var repo = new InMemoryMainRepository();
