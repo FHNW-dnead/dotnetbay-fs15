@@ -80,7 +80,7 @@ namespace DotNetBay.Core.Execution
         private void StartPendingAuctions()
         {
             // Process all auctions which should be closed
-            var auctionsToStart = this.repository.GetAuctions().Where(a => !a.IsRunning && a.StartDateTimeUtc < DateTime.UtcNow).ToList();
+            var auctionsToStart = this.repository.GetAuctions().Where(a => !a.IsRunning && a.StartDateTimeUtc < DateTime.UtcNow && a.EndDateTimeUtc > DateTime.UtcNow).ToList();
 
             foreach (var auction in auctionsToStart)
             {

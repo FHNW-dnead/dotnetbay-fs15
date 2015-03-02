@@ -161,6 +161,40 @@ namespace DotNetBay.Test.Core
         }
 
         [TestCase]
+        public void AuctionHasStartTimeInPast_AuctioneerRuns_AuctionIsRunning()
+        {
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow.AddHours(1));
+
+            auctioneer.DoAllWork();
+
+            Assert.IsFalse(auction.IsClosed);
+            Assert.IsTrue(auction.IsRunning);
+        }
+
+        [TestCase]
+        public void AuctionStartedAndEndedInThePast_AuctioneerRuns_DontGetsStarted()
+        {
+            var repo = new InMemoryMainRepository();
+            var auctioneer = new Auctioneer(repo);
+
+            AuctionEventArgs raisedArgs = null;
+            auctioneer.AuctionStarted += (sender, args) => raisedArgs = args;
+
+            var auction = CreateAndStoreAuction(repo, DateTime.UtcNow.AddHours(-2), DateTime.UtcNow.AddHours(-1));
+            auction.IsRunning = false;
+            auction.IsClosed = true;
+
+            auctioneer.DoAllWork();
+
+            Assert.IsNull(raisedArgs);
+            Assert.IsTrue(auction.IsClosed);
+            Assert.IsFalse(auction.IsRunning);
+        }
+
+        [TestCase]
         public void Auction_HasOneBidAndEnds_TheBidderShouldBeTheWinner()
         {
             var repo = new InMemoryMainRepository();
