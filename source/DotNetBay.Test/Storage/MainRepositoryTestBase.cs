@@ -200,6 +200,7 @@ namespace DotNetBay.Test.Storage
             myAuction.Seller = theSeller;
 
             var theBidder = CreateAMember();
+
             var bid = new Bid()
             {
                 Auction = myAuction,
@@ -223,10 +224,14 @@ namespace DotNetBay.Test.Storage
 
             // Sanity check
             Assert.AreEqual(2, allMembersFromRepo.Count());
-            Assert.IsNotNull(allMembersFromRepo[1].Bids);
 
-            Assert.AreEqual(1, allMembersFromRepo[1].Bids.Count);
-            Assert.AreEqual(bid, allMembersFromRepo[1].Bids[0]);
+            // Take the bidder to test
+            var bidderMember = allMembersFromRepo.FirstOrDefault(b => b.UniqueId == theBidder.UniqueId);
+            Assert.IsNotNull(bidderMember);
+            Assert.IsNotNull(bidderMember.Bids);
+
+            Assert.AreEqual(1, bidderMember.Bids.Count);
+            Assert.AreEqual(bid, bidderMember.Bids[0]);
         }
 
         [TestCase]
