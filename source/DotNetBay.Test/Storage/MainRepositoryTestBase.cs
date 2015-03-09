@@ -177,6 +177,7 @@ namespace DotNetBay.Test.Storage
                 testRepo.Add(myAuction);
                 testRepo.Add(theBidder);
                 testRepo.Add(bid);
+                testRepo.SaveChanges();
 
                 allAuctionsFromRepo = testRepo.GetAuctions().ToList();
             }
@@ -215,7 +216,8 @@ namespace DotNetBay.Test.Storage
                 testRepo.Add(myAuction);
                 testRepo.Add(theBidder);
                 testRepo.Add(bid);
-
+                testRepo.SaveChanges();
+                
                 allMembersFromRepo = testRepo.GetMembers().ToList();
             }
 
@@ -252,6 +254,7 @@ namespace DotNetBay.Test.Storage
                 testRepo.Add(theBidder);
                 testRepo.Add(myAuction);
                 testRepo.Add(bid);
+                testRepo.SaveChanges();
 
                 retrievedBid = testRepo.GetBidByTransactionId(bid.TransactionId);
             }
@@ -276,6 +279,8 @@ namespace DotNetBay.Test.Storage
                 var firstRepo = factory.CreateMainRepository();
                 firstRepo.Add(myMember);
                 firstRepo.Add(myMember);
+
+                firstRepo.SaveChanges();
             }
         }
 
@@ -295,6 +300,8 @@ namespace DotNetBay.Test.Storage
                 var testRepo = factory.CreateMainRepository();
                 testRepo.Add(myAuction);
                 testRepo.Add(myAuction);
+
+                testRepo.SaveChanges();
             }
         }
 
