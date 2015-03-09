@@ -89,13 +89,18 @@ namespace DotNetBay.Core.Execution
                 this.OnAuctionStarted(new AuctionEventArgs() { Auction = auction, IsSuccessful = true });
             }
 
-            this.repository.SaveChanges();
+            if (auctionsToStart.Any())
+            {
+                this.repository.SaveChanges();
+            }
         }
 
         private void ProcessOpenBids()
         {
             // Process all auctions with open bids
             var openAuctions = this.repository.GetAuctions().Where(a => a.Bids.Any(b => b.Accepted == null));
+            
+            var processedBids = false;
 
             foreach (var auction in openAuctions)
             {
@@ -120,10 +125,15 @@ namespace DotNetBay.Core.Execution
                         bid.Accepted = false;
                         this.OnBidDeclined(new ProcessedBidEventArgs { Bid = bid, Auction = auction });
                     }
+
+                    processedBids = true;
                 }
             }
 
-            this.repository.SaveChanges();
+            if (processedBids)
+            {
+                this.repository.SaveChanges();
+            }
         }
 
         private void EndAndCloseFinishedAuctions()
@@ -159,7 +169,10 @@ namespace DotNetBay.Core.Execution
                 auction.IsRunning = false;
             }
 
-            this.repository.SaveChanges();
+            if (auctionsToClose.Any() || auctionsToSync.Any())
+            {
+                this.repository.SaveChanges();
+            }
         }
 
         #endregion
