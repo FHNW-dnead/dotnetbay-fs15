@@ -120,8 +120,8 @@ namespace DotNetBay.Test.Storage
             var myMember = CreateAMember();
             var myAuction = CreateAnAuction();
 
-            IQueryable<Member> allMembersFromRepo;
-            IQueryable<Auction> allAuctionsFromRepo;
+            List<Member> allMembersFromRepo;
+            List<Auction> allAuctionsFromRepo;
 
             using (var factory = this.CreateFactory())
             {
@@ -137,8 +137,8 @@ namespace DotNetBay.Test.Storage
                 secondRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
-                allAuctionsFromRepo = testRepo.GetAuctions();
-                allMembersFromRepo = testRepo.GetMembers();
+                allAuctionsFromRepo = testRepo.GetAuctions().ToList();
+                allMembersFromRepo = testRepo.GetMembers().ToList();
             }
 
             Assert.AreEqual(1, allAuctionsFromRepo.Count(), "There should be exact 1 auction");
@@ -340,8 +340,8 @@ namespace DotNetBay.Test.Storage
             myAuction.Seller = myMember;
             myMember.Auctions = new List<Auction>(new[] { myAuction });
 
-            IQueryable<Member> allMembersFromRepo;
-            IQueryable<Auction> allAuctionFromRepo;
+            List<Member> allMembersFromRepo;
+            List<Auction> allAuctionFromRepo;
 
             using (var factory = this.CreateFactory())
             {
@@ -350,8 +350,8 @@ namespace DotNetBay.Test.Storage
                 initRepo.SaveChanges();
 
                 var testRepo = factory.CreateMainRepository();
-                allAuctionFromRepo = testRepo.GetAuctions();
-                allMembersFromRepo = testRepo.GetMembers();
+                allAuctionFromRepo = testRepo.GetAuctions().ToList();
+                allMembersFromRepo = testRepo.GetMembers().ToList();
             }
 
             Assert.AreEqual(1, allAuctionFromRepo.Count(), "There should be exact 1 auction");
