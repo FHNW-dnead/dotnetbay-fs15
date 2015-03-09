@@ -9,6 +9,8 @@ namespace DotNetBay.Model
             this.Auctions = new List<Auction>();
         }
 
+        public long Id { get; set; }
+
         public string UniqueId { get; set; }
 
         public string DisplayName { get; set; }
