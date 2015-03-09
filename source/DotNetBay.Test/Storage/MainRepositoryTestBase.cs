@@ -322,7 +322,7 @@ namespace DotNetBay.Test.Storage
         }
 
         [TestCase]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException]
         public void GivenEmptyRepo_AddMemberWithAuctionsFromOtherInstance_ShouldRaiseException()
         {
             var myAuction = CreateAnAuction();
@@ -343,6 +343,7 @@ namespace DotNetBay.Test.Storage
 
                 var testSore = factory.CreateMainRepository();
                 testSore.Add(otherMember);
+                testSore.SaveChanges();
             }
         }
 
