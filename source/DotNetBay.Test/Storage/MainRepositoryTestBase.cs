@@ -300,28 +300,6 @@ namespace DotNetBay.Test.Storage
 
         [TestCase]
         [ExpectedException(typeof(Exception))]
-        public void GivenEmptyRepo_AddAuctionAndMemberFromOtherInstance_ShouldRaiseException()
-        {
-            var myAuction = CreateAnAuction();
-            var myMember = CreateAMember();
-
-            // References
-            myAuction.Seller = myMember;
-            myMember.Auctions = new List<Auction>(new[] { myAuction });
-
-            using (var factory = this.CreateFactory())
-            {
-                var initRepo = factory.CreateMainRepository();
-                initRepo.Add(myAuction);
-                initRepo.SaveChanges();
-
-                var testRepo = factory.CreateMainRepository();
-                testRepo.Add(myAuction);
-            }
-        }
-
-        [TestCase]
-        [ExpectedException(typeof(Exception))]
         public void GivenEmptyRepo_AddMemberWithAuctionsFromOtherInstance_ShouldRaiseException()
         {
             var myAuction = CreateAnAuction();
@@ -432,11 +410,9 @@ namespace DotNetBay.Test.Storage
             Assert.IsNull(imageFromRepo);
         }
 
-        protected abstract IRepositoryFactory CreateFactory();
-
         #region Create Helpers
 
-        private static Auction CreateAnAuction()
+        protected static Auction CreateAnAuction()
         {
             return new Auction()
             {
@@ -446,7 +422,7 @@ namespace DotNetBay.Test.Storage
             };
         }
 
-        private static Member CreateAMember()
+        protected static Member CreateAMember()
         {
             return new Member()
             {
@@ -456,5 +432,7 @@ namespace DotNetBay.Test.Storage
         }
 
         #endregion
+
+        protected abstract IRepositoryFactory CreateFactory();
     }
 }

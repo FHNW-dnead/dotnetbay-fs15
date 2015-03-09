@@ -1,12 +1,38 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using DotNetBay.Data.FileStorage;
 using DotNetBay.Interfaces;
+using DotNetBay.Model;
+
+using NUnit.Framework;
 
 namespace DotNetBay.Test.Storage
 {
     public class FileSystemMainRepositoryTests : MainRepositoryTestBase
     {
+        [TestCase]
+        [ExpectedException(typeof(Exception))]
+        public void GivenEmptyRepo_AddAuctionAndMemberFromOtherInstance_ShouldRaiseException()
+        {
+            var myAuction = CreateAnAuction();
+            var myMember = CreateAMember();
+
+            // References
+            myAuction.Seller = myMember;
+            myMember.Auctions = new List<Auction>(new[] { myAuction });
+
+            using (var factory = this.CreateFactory())
+            {
+                var initRepo = factory.CreateMainRepository();
+                initRepo.Add(myAuction);
+                initRepo.SaveChanges();
+
+                var testRepo = factory.CreateMainRepository();
+                testRepo.Add(myAuction);
+            }
+        }
+
         protected override IRepositoryFactory CreateFactory()
         {
             return new TempFileMainRepositoryFactory();
