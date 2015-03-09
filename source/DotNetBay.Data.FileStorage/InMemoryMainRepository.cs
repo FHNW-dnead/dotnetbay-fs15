@@ -44,7 +44,7 @@ namespace DotNetBay.Data.FileStorage
 
                 if (this.data.Auctions.Any(a => a.Id == auction.Id))
                 {
-                    throw new ArgumentException("The auction is already stored");
+                    return auction;
                 }
 
                 var maxId = this.data.Auctions.Any() ? this.data.Auctions.Max(a => a.Id) : 0;
@@ -70,7 +70,7 @@ namespace DotNetBay.Data.FileStorage
 
                 if (this.data.Members.Any(m => m.UniqueId == member.UniqueId))
                 {
-                    throw new ArgumentException("A member with the same uniqueId already exists!");
+                    return member;
                 }
 
                 this.ThrowForInvalidReferences(member);

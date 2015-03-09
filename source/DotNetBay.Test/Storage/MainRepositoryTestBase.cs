@@ -269,8 +269,7 @@ namespace DotNetBay.Test.Storage
         }
 
         [TestCase]
-        [ExpectedException(typeof(ArgumentException))]
-        public void GivenARepoWithMember_AddMemberAgain_ShouldRaiseExecption()
+        public void GivenARepoWithMember_AddMemberAgain_ShouldNotAddTwice()
         {
             var myAuction = CreateAnAuction();
             var myMember = CreateAMember();
@@ -278,6 +277,8 @@ namespace DotNetBay.Test.Storage
             // References
             myAuction.Seller = myMember;
             myMember.Auctions = new List<Auction>(new[] { myAuction });
+
+            List<Member> allMembers;
 
             using (var factory = this.CreateFactory())
             {
@@ -286,12 +287,16 @@ namespace DotNetBay.Test.Storage
                 firstRepo.Add(myMember);
 
                 firstRepo.SaveChanges();
+
+                allMembers = firstRepo.GetMembers().ToList();
             }
+
+            Assert.NotNull(allMembers);
+            Assert.AreEqual(1, allMembers.Count(), "There should be only one member");
         }
 
         [TestCase]
-        [ExpectedException(typeof(ArgumentException))]
-        public void GivenARepoWithAuction_AddAuctionAgain_ShouldRaiseExecption()
+        public void GivenARepoWithAuction_AddAuctionAgain_ShouldNotAddTwice()
         {
             var myAuction = CreateAnAuction();
             var myMember = CreateAMember();
@@ -300,6 +305,8 @@ namespace DotNetBay.Test.Storage
             myAuction.Seller = myMember;
             myMember.Auctions = new List<Auction>(new[] { myAuction });
 
+            List<Auction> allAuctions;
+
             using (var factory = this.CreateFactory())
             {
                 var testRepo = factory.CreateMainRepository();
@@ -307,7 +314,11 @@ namespace DotNetBay.Test.Storage
                 testRepo.Add(myAuction);
 
                 testRepo.SaveChanges();
+                allAuctions = testRepo.GetAuctions().ToList();
             }
+
+            Assert.NotNull(allAuctions);
+            Assert.AreEqual(1, allAuctions.Count(), "There should be only one auction");
         }
 
         [TestCase]
