@@ -73,7 +73,7 @@ namespace DotNetBay.Test.Storage
 
             Assert.IsNotNull(memberFromRepo, "memberForRepo != null");
             Assert.IsNotNull(memberFromRepo.Auctions, "memberForRepo.Auctions != null");
-            Assert.AreEqual(1, memberFromRepo.Auctions.Count, "There should be exact one euction for this member");
+            Assert.AreEqual(1, memberFromRepo.Auctions.Count, "There should be exact one auction for this member");
 
             Assert.AreEqual(myAuction.Title, auctionFromRepo.Title, "Auction's title is not the same");
             Assert.AreEqual(myMember.UniqueId, memberFromRepo.UniqueId, "Member's uniqueId is not the same");
