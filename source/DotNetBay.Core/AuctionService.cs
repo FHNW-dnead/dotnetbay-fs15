@@ -48,7 +48,7 @@ namespace DotNetBay.Core
 
         public Bid PlaceBid(Member bidder, Auction auction, double amount)
         {
-            var auct = this.mainRepository.GetAuctions().FirstOrDefault(a => a.Id == auction.Id && a == auction);
+            var auct = this.mainRepository.GetAuctions().ToList().FirstOrDefault(a => a.Id == auction.Id && a == auction);
 
             if (auct == null)
             {
