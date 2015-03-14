@@ -10,7 +10,7 @@ With focus on the .NET-Stack, at least the following technologies should be adde
 
 * WPF / XAML UI
 * EntityFramework
-* ASP.NET MVC 4 UI 
+* ASP.NET MVC 5 UI 
 * ASP.NET WebApi
 * ASP.Net SignalR
 
