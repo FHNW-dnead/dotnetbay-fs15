@@ -6,7 +6,7 @@ namespace DotNetBay.Model
     {
         public Bid()
         {
-            this.TransactionId = new Guid();
+            this.TransactionId = Guid.NewGuid();
         }
 
         public long Id { get; set; }
