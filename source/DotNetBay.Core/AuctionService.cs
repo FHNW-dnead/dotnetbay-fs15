@@ -46,9 +46,11 @@ namespace DotNetBay.Core
             return newAuction;
         }
 
-        public Bid PlaceBid(Member bidder, Auction auction, double amount)
+        public Bid PlaceBid(Auction auction, double amount)
         {
             var auct = this.mainRepository.GetAuctions().ToList().FirstOrDefault(a => a.Id == auction.Id && a == auction);
+
+            var bidder = this.memberService.GetCurrentMember();
 
             if (auct == null)
             {

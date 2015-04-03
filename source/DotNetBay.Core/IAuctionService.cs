@@ -10,6 +10,6 @@ namespace DotNetBay.Core
 
         Auction Save(Auction auction);
 
-        Bid PlaceBid(Member bidder, Auction auction, double amount);
+        Bid PlaceBid(Auction auction, double amount);
     }
 }
